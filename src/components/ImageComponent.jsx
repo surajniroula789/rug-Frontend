@@ -1,4 +1,5 @@
 import React, { useState, useRef } from "react";
+import "../App.css";
 
 const ImageComponent = () => {
   const [imageSrc, setImageSrc] = useState("");
@@ -6,7 +7,8 @@ const ImageComponent = () => {
   const [error, setError] = useState(null);
 
   const [file, setFile] = useState();
-  const fileInputRef = useRef(null); // Create a reference to the input element
+  const inputRef = useRef(null);
+  const formData = new FormData();
 
   const handleFileInputChange = (e) => {
     setFile(e.target.files[0]);
@@ -18,16 +20,15 @@ const ImageComponent = () => {
 
   const handleDrop = (e) => {
     e.preventDefault();
-    const droppedFile = e.dataTransfer.files[0];
-    setFile(droppedFile);
-    handleImageUpload(droppedFile);
+    const droppedFiles = e.dataTransfer.files; // Fixed: Removed [0]
+    setFile(droppedFiles[0]); // Now it correctly accesses the dropped file
+    inputRef.current.files = droppedFiles; // Update the input element's files
   };
 
   const handleImageUpload = async (file) => {
     setLoading(true);
     setError(null);
 
-    const formData = new FormData();
     formData.append("image", file);
 
     try {
@@ -60,14 +61,14 @@ const ImageComponent = () => {
       >
         <div
           className="border border-gray-300 py-10 px-4 rounded-md cursor-pointer"
-          onClick={() => fileInputRef.current.click()} // Access click event of the input element
+          // onClick={() => fileInputRef.current.click()} // Access click event of the input element
         >
           <p className="text-lg  text-gray-600">
             Drag & Drop or Click to Upload
           </p>
           <input
             type="file"
-            ref={fileInputRef} // Assign the ref to the input element
+            ref={inputRef} // Assign the ref to the input element
             onChange={handleFileInputChange}
             accept="image/*"
             className="border border-gray-300 py-2 px-4 rounded-md"
@@ -81,9 +82,11 @@ const ImageComponent = () => {
         </button>
         {loading && <p className="text-gray-600">Loading...</p>}
         {error && <p className="text-red-500">{error}</p>}
-        {imageSrc && (
-          <div className="mt-8">
-            <h2 className="text-xl font-semibold mb-4">Generated Image:</h2>
+        {!loading && imageSrc && (
+          <div className="mt-8 output">
+            <h2 className="text-xl font-semibold mb-4 pt-2 pl-2">
+              Generated Image:
+            </h2>
             <img
               src={imageSrc}
               alt="Generated"
