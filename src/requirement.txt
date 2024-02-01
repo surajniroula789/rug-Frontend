@@ -1,0 +1,26 @@
+
+/main goals
+End user
+Wants to create friee/rossteet and wallpaper
+
+Wants to fill the borders if desires
+Wants to fill a rectangular region with the freieze/rossette or wallpapers
+Wants to resize each rectangular regions and the contents isnide it also resizing with same proportions
+Wants to drag and drop and move the basic motif items
+Wants to change color of certain motif items, their line width etc.
+Wants to save the final design
+
+Wants to share it with teammates and edit cocurrently with them?
+Wants ai tools to be side of him
+Wants to minimize the number of colors used in the design and get the color palettees
+
+
+
+Wants to get less sharp transition  in the design
+Wants to use merge art approach later
+
+
+////////////////////////////////////////////////////////////////////////////////////////////
+how to draw a fireze?
+
+

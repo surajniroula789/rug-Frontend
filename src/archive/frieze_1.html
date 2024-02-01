@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Fireze Symmetry</title>
+<style type="text/css">
+h2, h3 {
+    text-align: center;
+    color: white;
+    font-weight: bold;
+}
+a:link {
+    color: #CCCCFF;
+}
+a:visited {
+    color: #DDDDDD;
+}
+a:active {
+    color: #FFCCCC;
+}
+body {
+    background-color: gray;
+    margin: 0px;
+}
+#frieze {
+    margin: 0px;
+    padding: 0px;
+    border-top: 2px solid black;
+    border-bottom: 2px solid black;
+}
+#canvas {
+    display: block;
+    margin: 0px;
+    padding: 0px;
+    height: 128px;
+    background-color: white;
+}
+label {
+   white-space: pre;
+}
+</style>
+<script type="text/javascript">
+
+"use strict";
+
+var canvas, graphics;
+var OCanvas, OGraphics;
+
+var FREEHAND_TOOL = 5;
+
+var items = [];
+var itemCount = 0;
+var dragItem = null;
+
+// frieze specific
+var translationInput;
+var translate = 200;
+
+var groupNum = 0;
+
+var currentColor = "#000000";
+var currentTool = FREEHAND_TOOL;
+var currentLineWidth = 2;
+var currentLineCap = "butt";
+
+var clearedItems = null;
+
+var starting = true; 
+
+var colors = ["#000000", "#FF0000", "#00BB00", "#0000FF", "#00BBBB", "#DD00DD",
+                     "#FFFF00", "#DDDDDD", "#999999", "#555555"];
+
+function checkInput() {
+    let newT = Number(translationInput.value);
+    if ( isNaN(newT) || newT < 20 || newT > 1000 ) {
+        document.getElementById("tmsg").innerHTML="Translation must be a number, 10 to 1000! Change not applied";
+        return false;
+    }
+    document.getElementById("tmsg").innerHTML = "&nbsp;";
+    translate = newT;
+    return true;
+}
+
+function drawAll() {
+    OGraphics.fillStyle = "#FFFFFF";
+    OGraphics.fillRect(0,0,canvas.width,canvas.height);
+    //graphics.fillStyle = "#000000";
+    //graphics.strokeSTyle = "#000000";
+    //graphics.lineWidth = 1;
+    for (var i = 0; i < itemCount; i++) {
+        drawItem(OGraphics,items[i]);
+    }
+    draw();
+}
+
+function draw() {
+    graphics.drawImage(OCanvas,0,0);
+    
+    graphics.rotate(90*Math.PI/180);
+    graphics.drawImage(OCanvas,0,20);
+    if (dragItem) { 
+        drawItem(graphics,dragItem);
+    }
+    if (document.getElementById("showGridCB").checked) {
+        drawGrid();
+    }
+}
+
+function drawItemToOSC(item) {
+    drawItem(OGraphics,item);
+    graphics.drawImage(OCanvas,0,0);
+    if (document.getElementById("showGridCB").checked) {
+        drawGrid();
+    }
+}
+
+function drawItem(graphics,item) {
+    // decribes which particular item to draw
+    if (item.type == FREEHAND_TOOL) {
+        // if free hand tool; then recursive call is there
+        // 
+        for (var i = 0; i < item.lines.length; i++) {
+            drawItem(graphics,item.lines[i]);
+        }
+        return;
+    }
+    if (item.type > 2) {
+        graphics.fillStyle = item.color;
+    }
+    else {
+        graphics.strokeStyle = item.color;
+        graphics.lineWidth = item.lineWidth;
+        graphics.lineCap = item.lineCap;
+    }
+    drawBasicItem(graphics,item.type,item.x1,item.x2,item.y1,item.y2);
+    if (groupNum == 1 || groupNum == 3 || groupNum == 6) {
+       drawBasicItem(graphics,item.type,-item.x1,-item.x2,item.y1,item.y2);
+    }
+    if (groupNum == 2 || groupNum == 3) {
+        drawBasicItem(graphics,item.type,item.x1,item.x2,128-item.y1,128-item.y2);
+    }
+    if (groupNum == 3 || groupNum == 4) {
+        drawBasicItem(graphics,item.type,-item.x1,-item.x2,128-item.y1,128-item.y2);
+    }
+    if (groupNum == 5 || groupNum == 6) {
+        drawBasicItem(graphics,item.type,item.x1+translate/2,item.x2+translate/2,128-item.y1,128-item.y2);
+    }
+    if (groupNum == 6) {
+        drawBasicItem(graphics,item.type,-item.x1+translate/2,-item.x2+translate/2,128-item.y1,128-item.y2);
+    }
+}
+
+function drawBasicItem(graphics,type,x1,x2,y1,y2) {
+    // describes the way to draw line rectangle or 
+    var minX = Math.min(x1,x2) - 10;
+    var maxX = Math.max(x1,x2) + 10;
+    var startX = -translate * Math.floor( maxX/translate );
+    while (startX+minX < canvas.width) {
+        graphics.save();
+        graphics.translate(startX,0);
+        if (type == 0)
+            graphics.strokeLine(x1, y1, x2, y2);
+        else if (type == 1)
+            graphics.strokeRectFromCorners(x1, y1, x2, y2);
+        else if (type == 2)
+            graphics.strokeOval(x1, y1, x2, y2);
+        else if (type == 3)
+            graphics.fillRectFromCorners(x1, y1, x2, y2);
+        else 
+            graphics.fillOval(x1, y1, x2, y2);
+        graphics.restore();
+        startX += translate;
+    }
+}
+
+function drawGrid() {
+    graphics.lineWidth = 1;
+    graphics.lineCap = "butt";
+    graphics.globalAlpha = 0.5;
+    for (var i = 0; i < 2; i++) {
+        graphics.save();
+        if (i == 1) {
+            graphics.strokeStyle = "black";
+            graphics.translate(0.5,0.5);
+        }
+        else {
+            graphics.strokeStyle = "white";
+            graphics.translate(-0.5,-0.5);
+        }
+        var w = canvas.width;
+        var h = canvas.height;
+        var dx;
+        if (groupNum == 0 || groupNum == 2)
+            dx = translate;
+        else
+            dx = translate/2;
+        var x = dx;
+        while (x < w) {
+            graphics.strokeLine(x,0,x,h);
+            x += dx;
+        }
+        if (groupNum > 1) {
+            graphics.strokeLine(0,h/2,w,h/2);
+        }
+        graphics.restore();
+    }
+    graphics.globalAlpha = 1.0;
+}
+
+function doApply() {
+    if (checkInput()) {
+        drawAll();
+    }
+}
+
+function checkForReturnKey(evt) {
+    if (evt.keyCode == 13)
+       doApply();
+}
+
+function undo() {
+    if (clearedItems != null) {
+        items = clearedItems;
+        itemCount = items.length;
+        drawAll();
+        document.getElementById("undo").disabled = false;
+        document.getElementById("redo").disabled = true;
+        clearedItems = null;
+    }
+    else if (itemCount > 0) {
+        itemCount--;
+        drawAll();
+        if (itemCount == 0)
+            document.getElementById("undo").disabled = true;
+        document.getElementById("redo").disabled = false;
+    }
+    document.getElementById("clear").disabled = itemCount === 0;
+    document.getElementById("savebtn").disabled = itemCount === 0;
+}
+
+function redo() {
+    if (itemCount < items.length) {
+        itemCount++;
+        drawAll();
+        if (itemCount == items.length)
+            document.getElementById("redo").disabled = true;
+        document.getElementById("undo").disabled = false;
+        document.getElementById("clear").disabled = false;
+        document.getElementById("savebtn").disabled = false;
+    }
+}
+
+function clearDrawing() {
+    if (items.length == 0)
+        return;
+    if (itemCount > 0) {
+        if (items.length > itemCount)
+            items.splice(itemCount,items.length-itemCount);
+        clearedItems = items;
+    }
+    else {
+        clearedItems = null;
+    }
+    items = [];
+    itemCount = 0;
+    drawAll();
+    document.getElementById("clear").disabled = true;
+    document.getElementById("savebtn").disabled = true;
+    document.getElementById("redo").disabled = true;
+    document.getElementById("undo").disabled = clearedItems == null;
+}
+
+function selectColor(color) {
+    currentColor = colors[color];
+}
+
+function selectLineWidth(lineWidth) {
+    currentLineWidth = Number(lineWidth);
+    if (currentTool == FREEHAND_TOOL || currentLineWidth >= 3) {
+        currentLineCap = "round";
+    }
+    else {
+        currentLineCap = "butt";
+    }
+}
+
+function selectTool(tool) {
+    currentTool = Number(tool);
+    if (currentTool == FREEHAND_TOOL || currentLineWidth >= 3) {
+        currentLineCap = "round";
+    }
+    else {
+        currentLineCap = "butt";
+    }
+}
+
+function selectGroup(group) {
+    group = Number(group);
+    if (group != groupNum) {
+        groupNum = group;
+        drawAll();
+    }
+}
+
+function installMouser(theCanvas) {
+    function convertX(clientX) {
+        return Math.round(clientX - theCanvas.getBoundingClientRect().left);
+    }
+    function convertY(clientY) {
+        return Math.round(clientY - theCanvas.getBoundingClientRect().top);
+    }
+    function doMouseDrag(evt){
+        if (dragItem == null)
+           return;
+        dragItem.x2 = convertX(evt.clientX);
+        dragItem.y2 = convertY(evt.clientY);
+        if (currentTool == FREEHAND_TOOL) {
+            var segment = {};
+            segment.type = 0;
+            segment.x1 = dragItem.x1;
+            segment.x2 = dragItem.x2;
+            segment.y1 = dragItem.y1;
+            segment.y2 = dragItem.y2;
+            segment.color = currentColor;
+            segment.lineWidth = currentLineWidth;
+            segment.lineCap = currentLineCap;
+            dragItem.lines.push(segment);
+            drawItemToOSC(segment);
+            dragItem.x1 = dragItem.x2;
+            dragItem.y1 = dragItem.y2;
+        }
+        else  {
+            draw();
+        }
+        evt.preventDefault();
+    }
+    function doMouseUp(evt){
+        if (dragItem == null)
+            return;
+        theCanvas.removeEventListener("mousemove", doMouseDrag);
+        document.removeEventListener("mouseup", doMouseUp);
+        if ( (currentTool == FREEHAND_TOOL && dragItem.lines.length > 0)
+                    || (currentTool == 0 && (dragItem.x1 != dragItem.x2 || dragItem.y1 != dragItem.y2))
+                    || (currentTool > 0 && currentTool < FREEHAND_TOOL && dragItem.x1 != dragItem.x2 && dragItem.y1 != dragItem.y2)) {
+            if (itemCount < items.length)
+                items.splice(itemCount,items.length-itemCount);
+            items.push(dragItem); 
+            itemCount = items.length;
+            if (currentTool != FREEHAND_TOOL) {
+                drawItem(OGraphics,dragItem);
+            }
+            document.getElementById("undo").disabled = false;
+            document.getElementById("redo").disabled = true;
+            document.getElementById("clear").disabled = false;
+            document.getElementById("savebtn").disabled = false;
+            clearedItems = null;
+        }
+        dragItem = null;
+        draw();
+        evt.preventDefault();
+    }
+    function doMouseDown(evt){
+        if (starting) {
+            drawAll();
+            starting = false;
+        }
+        if (dragItem != null || evt.button > 0)
+           return;
+        document.getElementById("tmsg").innerHTML = "&nbsp;";
+        theCanvas.addEventListener("mousemove", doMouseDrag);
+        document.addEventListener("mouseup", doMouseUp);
+        dragItem = {};
+        dragItem.type = currentTool;
+        dragItem.color = currentColor;
+        dragItem.lineWidth = currentLineWidth;
+        dragItem.lineCap = currentLineCap;
+        dragItem.x1 = dragItem.x2 = convertX(evt.clientX);
+        dragItem.y1 = dragItem.y2 = convertY(evt.clientY);
+        if (currentTool == FREEHAND_TOOL) {
+            dragItem.lines = [];
+        }
+        evt.preventDefault();
+    }
+    theCanvas.addEventListener("mousedown", doMouseDown);
+}
+
+
+function doResize() {
+    var rect = document.getElementById("frieze").getBoundingClientRect();
+    canvas.width = rect.width;
+    canvas.height = 128;
+    OCanvas.width = canvas.width;
+    OCanvas.height = canvas.height;
+    drawAll();
+}
+
+
+
+function init() {
+
+    try {
+        canvas = document.getElementById("canvas");
+        graphics = canvas.getContext("2d");
+        
+        OCanvas = document.createElement("canvas");
+        OCanvas.width = canvas.width;
+        OCanvas.height = canvas.height;
+        OGraphics = OCanvas.getContext("2d");
+        
+    }
+    catch (e) {
+        document.getElementById("bb").innerHTML =
+              "Sorry, could not create the graphics context that is required for this page.";
+        return;
+    }
+
+    translationInput = document.getElementById("translation");
+    translationInput.value = "200";
+    document.getElementById("g0").checked = true;
+    document.getElementById("t" + currentTool).checked = true;
+    document.getElementById("lw" + currentLineWidth).checked = true;
+    document.getElementById("c0").checked = true;
+    document.getElementById("undo").disabled = true;
+    document.getElementById("redo").disabled = true;
+    document.getElementById("clear").disabled = true;
+    document.getElementById("savebtn").disabled = true;
+    document.getElementById("showGridCB").checked = false;
+    document.getElementById("translation").onkeydown = checkForReturnKey;
+    document.getElementById("translation").value = "" + translate;
+    doResize();
+    window.onresize = doResize;
+    installMouser(canvas);
+    installTouchHandler(canvas);
+    setUpFileHandling();
+    drawAll();
+    graphics.font = "14pt Serif";
+    graphics.fillStyle = "black";
+    graphics.fillText("Drag with left-mouse button in white area.", 15,30);
+    graphics.fillText("(Or use your finger on a touch screen.)", 15, 48);
+}
+
+</script>
+</head>
+<body onload="init()">
+
+<noscript>
+<h2 style="color:#900">Sorry, this page requires JavaScript.</h2>
+</noscript>
+
+<div id="content">
+
+<h2>Frieze Symmetry</h2>
+<h3>(<a href="symmetry-info.html">Click here</a> for info and instructions.)</h3>
+
+<div id="frieze"><canvas id="canvas">Sorry. This web page requires canvas graphics,<br>
+which your web browser does nto support.</p></canvas></div>
+
+<p align=center id="bb">
+   <button id="undo" onclick="undo()" title="Remove the most recently drawn item.  Can also undo Clear if used immediately after clearing.">Undo</button>
+   <button id="redo" onclick="redo()" title="Restore the draw item that was removed most recently by Undo.">Redo</button>
+   <button id="clear" onclick="clearDrawing()" title="Clear the current image.  This can be undone if you click 'Undo' immediately after clearing.">Clear</button>
+   <label style="color:white; font-weight:bold"><input type="checkbox" onchange="draw()" id="showGridCB" style="margin-left:30px">Show&nbsp;Grid</label>
+   <button id="savebtn" style="margin-left:30px" title="Save to local file.  This will not save the image; it saves a specification of the image that can be reloaded into this web app.">Save</button>
+   <button id="loadbtn" title="Load image specification from a local file.  File load cannot be undone.">Load</button>
+</p>
+
+<table align=center border=1 bgcolor="#D8D8D8" cellpadding=10 cellspacing=0>
+<tr><td colspan=4 align=center><label  title="Horizontal translation in pixels, in the range 20 to 1000.  You must click Apply or press Enter for a change to take effect.">Translation Amount:
+                         <input type="text" size="4" maxlength="4" id="translation"></label>
+          <button onclick="doApply()" title="Check input and if legal, apply to current image.  You can also do this by pressing Enter in an input box.">Apply</button><br>
+          <span id="tmsg" style="color:red">&nbsp;</span></td></tr>
+<tr>
+<td valign=top>
+<b>Symmetry&nbsp;Group:</b><br>
+<label><input type="radio" name="group" value="0" id="g0" onclick="selectGroup(this.value)"> p111</label><br>
+<label><input type="radio" name="group" value="1" id="g1" onclick="selectGroup(this.value)"> pm11</label><br>
+<label><input type="radio" name="group" value="2" id="g2" onclick="selectGroup(this.value)"> p1m1</label><br>
+<label><input type="radio" name="group" value="3" id="g3" onclick="selectGroup(this.value)"> pmm2</label><br>
+<label><input type="radio" name="group" value="4" id="g4" onclick="selectGroup(this.value)"> p112</label><br>
+<label><input type="radio" name="group" value="5" id="g5" onclick="selectGroup(this.value)"> p1a1</label><br>
+<label><input type="radio" name="group" value="6" id="g6" onclick="selectGroup(this.value)"> pma2</label><br>
+</td>
+<td valign=top>
+<b>Tool:</b><br>
+<label><input type="radio" name="tool" value="0" id="t0" onclick="selectTool(this.value)"> Line</label><br>
+<label><input type="radio" name="tool" value="1" id="t1" onclick="selectTool(this.value)"> Rectangle</label><br>
+<label><input type="radio" name="tool" value="2" id="t2" onclick="selectTool(this.value)"> Oval</label><br>
+<label><input type="radio" name="tool" value="3" id="t3" onclick="selectTool(this.value)"> Filled Rect</label><br>
+<label><input type="radio" name="tool" value="4" id="t4" onclick="selectTool(this.value)"> Filled Oval</label><br>
+<label><input type="radio" name="tool" value="5" id="t5" onclick="selectTool(this.value)"> Freehand</label><br>
+</td>
+<td valign=top>
+<b>Line&nbsp;Width:</b><br>
+<label><input type="radio" name="linewidth" value="1" id="lw1" onclick="selectLineWidth(this.value)"> 1</label><br>
+<label><input type="radio" name="linewidth" value="2" id="lw2" onclick="selectLineWidth(this.value)"> 2</label><br>
+<label><input type="radio" name="linewidth" value="3" id="lw3" onclick="selectLineWidth(this.value)"> 3</label><br>
+<label><input type="radio" name="linewidth" value="4" id="lw4" onclick="selectLineWidth(this.value)"> 4</label><br>
+<label><input type="radio" name="linewidth" value="5" id="lw5" onclick="selectLineWidth(this.value)"> 5</label><br>
+<label><input type="radio" name="linewidth" value="10" id="lw10" onclick="selectLineWidth(this.value)"> 10</label><br>
+<label><input type="radio" name="linewidth" value="20" id="lw20" onclick="selectLineWidth(this.value)"> 20</label><br>
+</td>
+<td valign=top>
+<b>Color:</b><br>
+<label><input type="radio" name="color" value="0" id="c0" onclick="selectColor(this.value)"> Black</label><br>
+<label><input type="radio" name="color" value="1" id="c1" onclick="selectColor(this.value)"> Red</label><br>
+<label><input type="radio" name="color" value="2" id="c2" onclick="selectColor(this.value)"> Green</label><br>
+<label><input type="radio" name="color" value="3" id="c3" onclick="selectColor(this.value)"> Blue</label><br>
+<label><input type="radio" name="color" value="4" id="c4" onclick="selectColor(this.value)"> Cyan</label><br>
+<label><input type="radio" name="color" value="5" id="c5" onclick="selectColor(this.value)"> Magenta</label><br>
+<label><input type="radio" name="color" value="6" id="c6" onclick="selectColor(this.value)"> Yellow</label><br>
+<label><input type="radio" name="color" value="7" id="c7" onclick="selectColor(this.value)"> Light Gray</label><br>
+<label><input type="radio" name="color" value="8" id="c8" onclick="selectColor(this.value)"> Gray</label><br>
+<label><input type="radio" name="color" value="9" id="c9" onclick="selectColor(this.value)"> Dark Gray</label><br>
+</td>
+</tr>
+</table>
+
+</div>
+</body>
+</html>
