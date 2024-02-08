@@ -1,11 +1,15 @@
 import React, { useState, useRef, useEffect } from "react";
 import Header from "./Header";
+import { useNavigate } from "react-router-dom";
 
 const Canvas = React.forwardRef((props, ref) => {
-  return <canvas ref={ref} {...props} />;
+  return <canvas ref={ref} {...props} style={{ border: "2px solid black" }} />;
 });
 
 const Walpaper = () => {
+  const navigate = useNavigate();
+  const [canvasImage, setCanvasImage] = useState(null); // State to store the image data
+
   const canvasRef = useRef(null);
   const OcanvasRef = useRef(null);
 
@@ -1176,6 +1180,7 @@ const Walpaper = () => {
     const dataURL = canvas.toDataURL();
     localStorage.setItem("wallpaperImage", dataURL); // Store image data in local storage
     // Navigate to the canvas page
+    navigate("/c-wall");
   };
 
   return (
@@ -1184,188 +1189,215 @@ const Walpaper = () => {
       <div id="content">
         <h2>Wallpaper Symmetry</h2>
 
-        <Canvas ref={canvasRef} width={800} height={600} id="c1" />
+        <div className="flex justify-center items-center mb-12 ">
+          <Canvas ref={canvasRef} width={600} height={600} id="c1" />
+        </div>
+
         <Canvas ref={OcanvasRef} width={800} height={600} id="c2" hidden />
 
         <table border={0} cellPadding={5} cellSpacing={5} align="center">
           <tbody>
             <tr>
-              <td colSpan={2}>
-                <span id="error">&nbsp;</span>
+              <td colspan="2">
+                <span id="error" class="block">
+                  &nbsp;
+                </span>
               </td>
             </tr>
-            <tr>
-              <td colSpan={3} bgcolor="#DDDDDD">
-                <label title="Horizontal translation in pixels, in the range 30 to 400. You must click Apply or press Enter for a change to take effect.">
-                  Translation Amount:{" "}
-                  <input
-                    onChange={checkForReturnKey}
-                    type="text"
-                    size={3}
-                    maxLength={3}
-                    value={translation1.current}
-                  />
-                </label>
-                <span
-                  id="trans2holder"
-                  style={{ marginLeft: "20px", display: "none" }}
-                >
-                  <label title="Vertical translation in pixels, in the range 30 to 400. You must click Apply or press Enter for a change to take effect.">
-                    2nd Translation:{" "}
+            <tr class="flex flex-wrap">
+              {/* <!-- Form controls --> */}
+              <td
+                colspan="3"
+                class="bg-gray-200 p-4 flex flex-wrap justify-between"
+              >
+                <div class="flex flex-col mb-4">
+                  <label
+                    class="block mb-2"
+                    title="Horizontal translation in pixels, in the range 30 to 400. You must click Apply or press Enter for a change to take effect."
+                  >
+                    Translation Amount:
                     <input
                       onChange={checkForReturnKey}
                       type="text"
-                      size={3}
-                      maxLength={3}
-                      value={translation2.current}
+                      size="3"
+                      maxLength="3"
+                      value={translation1.current}
+                      class="border rounded px-2 py-1 ml-2"
                     />
                   </label>
-                </span>
-                <span
-                  id="offsetholder"
-                  style={{ marginLeft: "20px", display: "none" }}
-                >
-                  <label title="Amount by which each row is offset horizontally from the previous row. Any value is equivalent to one between plus and minus Translation/2. You must click Apply or press Enter for a change to take effect.">
-                    Row Offset:{" "}
-                    <input
-                      onChange={checkForReturnKey}
-                      type="text"
-                      size={3}
-                      maxLength={4}
-                      value={rowOffsetRef.current}
-                    />
-                  </label>
-                </span>
-                <button
-                  style={{ marginLeft: "20px" }}
-                  onClick={doApply}
-                  title="Check input and if legal, apply to current image. You can also do this by pressing Enter in an input box."
-                >
-                  Apply
-                </button>
-              </td>
-            </tr>
-            <tr>
-              <td valign="top" bgcolor="#DDDDDD">
-                <p>
-                  <b>
-                    Symmetry
-                    <br />
-                    Group:
-                  </b>
-                  <br />
-                  <br />
-                  {[
-                    1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17,
-                  ].map((num) => (
-                    <label key={num}>
+                  <span id="trans2holder" class="hidden">
+                    <label
+                      class="block mb-2"
+                      title="Vertical translation in pixels, in the range 30 to 400. You must click Apply or press Enter for a change to take effect."
+                    >
+                      2nd Translation:
                       <input
-                        type="radio"
-                        name="group"
-                        value={num}
-                        id={`g${num}`}
-                        onClick={() => selectGroup(num)}
+                        onChange={checkForReturnKey}
+                        type="text"
+                        size="3"
+                        maxLength="3"
+                        value={translation2.current}
+                        class="border rounded px-2 py-1 ml-2"
                       />
-                      {` p${num}`}
                     </label>
-                  ))}
-                </p>
-              </td>
-              <td valign="top">
-                <button
-                  id="savebtn"
-                  onClick={undo}
-                  title="Remove the most recently drawn item. Can also undo Clear if used immediately after clearing."
-                >
-                  Undo
-                </button>
-                <button
-                  id="undo"
-                  onClick={undo}
-                  title="Remove the most recently drawn item. Can also undo Clear if used immediately after clearing."
-                >
-                  Undo
-                </button>
-                <button
-                  id="redo"
-                  onClick={redo}
-                  title="Restore the draw item that was removed most recently by Undo."
-                >
-                  Redo
-                </button>
-                <button
-                  id="clear"
-                  onClick={clearDrawing}
-                  title="Clear the current image. This can be undone if you click 'Undo' immediately after clearing."
-                >
-                  Clear
-                </button>
-                <input
-                  type="checkbox"
-                  onChange={drawGrid}
-                  id="showGridCB"
-                  style={{ marginLeft: "30px" }}
-                />
-                <button
-                  id="savebtn"
-                  onClick={handleSave}
-                  title="Save to local file. This will not save the image; it saves a specification of the image that can be reloaded into this web app."
-                >
-                  Save
-                </button>
-                <label htmlFor="showGridCB" style={{ color: "white" }}>
-                  Show Grid
-                </label>
-              </td>
-              <td valign="top" bgcolor="#DDDDDD">
-                <p>
-                  <b>Tool:</b>
-                  <br />
-                  {[0, 1, 2, 3, 4, 5].map((tool) => (
-                    <label key={tool}>
+                  </span>
+                  <span id="offsetholder" class="hidden">
+                    <label
+                      class="block mb-2"
+                      title="Amount by which each row is offset horizontally from the previous row. Any value is equivalent to one between plus and minus Translation/2. You must click Apply or press Enter for a change to take effect."
+                    >
+                      Row Offset:
                       <input
-                        type="radio"
-                        name="tool"
-                        value={tool}
-                        id={`t${tool}`}
-                        onClick={() => selectTool(tool)}
+                        onChange={checkForReturnKey}
+                        type="text"
+                        size="3"
+                        maxLength="4"
+                        value={rowOffsetRef.current}
+                        class="border rounded px-2 py-1 ml-2"
                       />
-                      {` ${tool === 5 ? "Freehand" : ` Tool ${tool}`}`}
                     </label>
-                  ))}
-                </p>
-                <p>
-                  <b>Line Width:</b>
-                  <br />
-                  {[1, 2, 3, 4, 5, 10, 20].map((width) => (
-                    <label key={width}>
-                      <input
-                        type="radio"
-                        name="linewidth"
-                        value={width}
-                        id={`lw${width}`}
-                        onClick={() => selectLineWidth(width)}
-                      />
-                      {` ${width}`}
-                    </label>
-                  ))}
-                </p>
-                <p>
-                  <b>Color:</b>
-                  <br />
-                  {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((color) => (
-                    <label key={color}>
-                      <input
-                        type="radio"
-                        name="color"
-                        value={color}
-                        id={`c${color}`}
-                        onClick={() => selectColor(color)}
-                      />
-                      {` ${color === 7 ? "Light Gray" : ` Color ${color}`}`}
-                    </label>
-                  ))}
-                </p>
+                  </span>
+                  <button
+                    onClick={doApply}
+                    title="Check input and if legal, apply to current image. You can also do this by pressing Enter in an input box."
+                    class="btn bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ml-4"
+                  >
+                    Apply
+                  </button>
+                </div>
+                {/* <!-- Symmetry Group --> */}
+                <div class="flex flex-col w-1/4">
+                  <p class="font-bold mb-2">Symmetry Group:</p>
+                  <div class="grid grid-cols-3 gap-2">
+                    {[
+                      1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17,
+                    ].map((num) => (
+                      <label key={num} class="flex items-center">
+                        <input
+                          type="radio"
+                          name="group"
+                          value={num}
+                          id={`g${num}`}
+                          onClick={() => selectGroup(num)}
+                          class="mr-2"
+                        />
+                        <span>{`p${num}`}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+                {/* <!-- Drawing controls --> */}
+                <div class="flex flex-col w-1/2">
+                  <div class="grid grid-cols-2 gap-4">
+                    {/* <!-- Undo/Redo/Clear buttons --> */}
+                    <div class="flex flex-col space-y-2">
+                      <button
+                        id="undo"
+                        class="btn"
+                        onClick={undo}
+                        title="Remove the most recently drawn item. Can also undo Clear if used immediately after clearing."
+                      >
+                        Undo
+                      </button>
+                      <button
+                        id="redo"
+                        class="btn"
+                        onClick={redo}
+                        title="Restore the draw item that was removed most recently by Undo."
+                      >
+                        Redo
+                      </button>
+                      <button
+                        id="clear"
+                        class="btn"
+                        onClick={clearDrawing}
+                        title="Clear the current image. This can be undone if you click 'Undo' immediately after clearing."
+                      >
+                        Clear
+                      </button>
+                    </div>
+                    {/* <!-- Save button and Show Grid checkbox --> */}
+                    <div class="flex flex-col space-y-2">
+                      <button
+                        id="savebtn"
+                        class="btn bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                        onClick={handleSave}
+                      >
+                        Send
+                      </button>
+                      <label for="showGridCB" class="text-white">
+                        <input
+                          // type="checkbox"
+                          onChange={drawGrid}
+                          id="showGridCB"
+                          class="mr-2"
+                        />
+                        Show Grid
+                      </label>
+                    </div>
+                  </div>
+                  {/* <!-- Tool, Line Width, and Color controls --> */}
+                  <div class="grid grid-cols-3 gap-4 mt-4">
+                    <div>
+                      <p class="font-bold mb-2">Tool:</p>
+                      <div class="space-y-2">
+                        {[0, 1, 2, 3, 4, 5].map((tool) => (
+                          <label key={tool} class="flex items-center">
+                            <input
+                              type="radio"
+                              name="tool"
+                              value={tool}
+                              id={`t${tool}`}
+                              onClick={() => selectTool(tool)}
+                              class="mr-2"
+                            />
+                            <span>
+                              {tool === 5 ? "Freehand" : `Tool ${tool}`}
+                            </span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                    <div>
+                      <p class="font-bold mb-2">Line Width:</p>
+                      <div class="space-y-2">
+                        {[1, 2, 3, 4, 5, 10, 20].map((width) => (
+                          <label key={width} class="flex items-center">
+                            <input
+                              type="radio"
+                              name="linewidth"
+                              value={width}
+                              id={`lw${width}`}
+                              onClick={() => selectLineWidth(width)}
+                              class="mr-2"
+                            />
+                            <span>{width}</span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                    <div>
+                      <p class="font-bold mb-2">Color:</p>
+                      <div class="space-y-2">
+                        {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((color) => (
+                          <label key={color} class="flex items-center">
+                            <input
+                              type="radio"
+                              name="color"
+                              value={color}
+                              id={`c${color}`}
+                              onClick={() => selectColor(color)}
+                              class="mr-2"
+                            />
+                            <span>
+                              {color === 7 ? "Light Gray" : `Color ${color}`}
+                            </span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </td>
             </tr>
           </tbody>

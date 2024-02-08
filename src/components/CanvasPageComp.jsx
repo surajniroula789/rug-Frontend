@@ -6,18 +6,7 @@ const Canvas = React.forwardRef((props, ref) => {
   return <canvas ref={ref} {...props} style={{ border: "2px solid black" }} />;
 });
 
-const CanvasPage = () => {
-  const [rosetteImg, setRosetteImg] = useState("");
-  const [wallpaperImg, setWallpaperImg] = useState("");
-
-  useEffect(() => {
-    const storedWallpaperImage = localStorage.getItem("wallpaperImage");
-    const storedRosetteImage = localStorage.getItem("rosetteImage");
-
-    setRosetteImg(storedRosetteImage);
-    setWallpaperImg(storedWallpaperImage);
-  }, []);
-
+const SendToBackend = () => {
   const sendData = async () => {
     const data = [
       {
@@ -40,9 +29,14 @@ const CanvasPage = () => {
 
   return (
     <>
-      <button onClick={sendData}>Send</button>
+      <button
+        className=" mt-6 ml-4 mb-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+        onClick={sendData}
+      >
+        Send
+      </button>
     </>
   );
 };
 
-export default CanvasPage;
+export default SendToBackend;

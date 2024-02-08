@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Header from "./Header";
 
 const Canvas = React.forwardRef((props, ref) => {
@@ -6,6 +7,7 @@ const Canvas = React.forwardRef((props, ref) => {
 });
 
 const Rossette = () => {
+  const navigate = useNavigate();
   const [canvasImage, setCanvasImage] = useState(null); // State to store the image data
 
   const handleSend = () => {
@@ -13,6 +15,7 @@ const Rossette = () => {
     const dataURL = canvas.toDataURL();
     localStorage.setItem("rosetteImage", dataURL); // Store image data in local storage
     // Navigate to the canvas page
+    navigate("/c-rosette");
   };
 
   const handleSave = () => {
@@ -428,6 +431,60 @@ const Rossette = () => {
     Freehand: 5,
   };
 
+  // Undo function
+  const undo = () => {
+    if (clearedItemsRef.current !== null) {
+      itemsRef.current = clearedItemsRef.current;
+      itemCountRef.current = itemsRef.current.length;
+      drawAll();
+      document.getElementById("undo").disabled = false;
+      document.getElementById("redo").disabled = true;
+      clearedItemsRef.current = null;
+    } else if (itemCountRef.current > 0) {
+      itemCountRef.current--;
+      drawAll();
+      if (itemCountRef.current === 0)
+        document.getElementById("undo").disabled = true;
+      document.getElementById("redo").disabled = false;
+    }
+    document.getElementById("clear").disabled = itemCountRef.current === 0;
+    document.getElementById("savebtn").disabled = itemCountRef.current === 0;
+  };
+
+  // Redo function
+  const redo = () => {
+    if (itemCountRef.current < itemsRef.current.length) {
+      itemCountRef.current++;
+      drawAll();
+      if (itemCountRef.current === itemsRef.current.length)
+        document.getElementById("redo").disabled = true;
+      document.getElementById("clear").disabled = false;
+      document.getElementById("savebtn").disabled = false;
+    }
+  };
+
+  // Clear drawing function
+  const clearDrawing = () => {
+    if (itemsRef.current.length === 0) return;
+    if (itemCountRef.current > 0) {
+      if (itemsRef.current.length > itemCountRef.current)
+        itemsRef.current.splice(
+          itemCountRef.current,
+          itemsRef.current.length - itemCountRef.current
+        );
+      clearedItemsRef.current = itemsRef.current;
+    } else {
+      clearedItemsRef.current = null;
+    }
+    itemsRef.current = [];
+    itemCountRef.current = 0;
+    drawAll();
+    document.getElementById("clear").disabled = true;
+    document.getElementById("savebtn").disabled = true;
+    document.getElementById("redo").disabled = true;
+    document.getElementById("undo").disabled = clearedItemsRef.current === null;
+  };
+
   return (
     <>
       <Header />
@@ -440,147 +497,202 @@ const Rossette = () => {
           </span>
         </h2>
 
-        <Canvas ref={canvasRef} width={600} height={600} id="c1" />
-        <Canvas ref={OcanvasRef} width={800} height={600} id="c2" hidden />
+        <div className="flex justify-center items-center mb-12 ">
+          <Canvas
+            ref={canvasRef}
+            width={300}
+            height={300}
+            id="c1"
+            className="rounded-full border border-gray-500"
+          />
+        </div>
+
+        <Canvas ref={OcanvasRef} width={300} height={300} id="c2" hidden />
 
         <table border={0} cellPadding={5} cellSpacing={5} align="center">
           <tbody>
-            <tr>
-              <td valign="top" bgcolor="#DDDDDD">
-                <p>
-                  <label>
-                    <input
-                      type="checkbox"
-                      id="reflectionCB"
-                      onChange={(e) => doReflect(e.target.checked)}
-                      checked={reflection.current}
-                    />
-                    <b>Reflection</b>
-                  </label>
-                </p>
-                <p>
-                  <b>Rotations:</b>
-                  <br />
-                  {[
-                    1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17,
-                    18, 19, 20,
-                  ].map((value) => (
-                    <label key={value}>
+            <tr class="flex flex-wrap">
+              {/* <!-- Reflection and Rotations controls --> */}
+              <td class="w-full md:w-1/3 bg-gray-200 p-4">
+                <div class="space-y-4">
+                  <div>
+                    <label class="inline-flex items-center">
                       <input
-                        type="radio"
-                        name="rotations"
-                        value={value}
-                        id={`r${value}`}
-                        onChange={(e) => selectRotationCount(e.target.value)} // Change this
-                        checked={rotationCount.current === value}
+                        type="checkbox"
+                        id="reflectionCB"
+                        onChange={(e) => doReflect(e.target.checked)}
+                        checked={reflection.current}
+                        class="form-checkbox h-4 w-4 text-blue-500"
                       />
-                      {value === 1 ? "none" : value}
+                      <span class="ml-2">
+                        <b>Reflection</b>
+                      </span>
                     </label>
-                  ))}
-                </p>
+                  </div>
+                  <div>
+                    <p>
+                      <b>Rotations:</b>
+                    </p>
+                    <div class="grid grid-cols-3 gap-2">
+                      {[
+                        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
+                        17, 18, 19, 20,
+                      ].map((num) => (
+                        <label key={num} class="flex items-center">
+                          <input
+                            type="radio"
+                            name="group"
+                            value={num}
+                            id={`g${num}`}
+                            onClick={() => selectGroup(num)}
+                            class="mr-2"
+                          />
+                          <span>{`p${num}`}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                </div>
               </td>
-              <td valign="top">
-                <p align="center" id="bb">
-                  <button
-                    id="undo"
-                    title="Remove the most recently drawn item. Can also undo Clear if used immediately after clearing."
-                  >
-                    Undo
-                  </button>
-                  <button
-                    id="redo"
-                    title="Restore the draw item that was removed most recently by Undo."
-                  >
-                    Redo
-                  </button>
-                  <button
-                    id="clear"
-                    title="Clear the current image. This can be undone if you click 'Undo' immediately after clearing."
-                  >
-                    Clear
-                  </button>
-                  <input
-                    type="checkbox"
-                    onChange={draw}
-                    id="showSlicesCB"
-                    style={{ marginLeft: "30px" }}
-                  />
-                  <label htmlFor="showSlicesCB" style={{ color: "white" }}>
-                    Show Slices
-                  </label>
-                  <button
-                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                    onClick={handleSend}
-                  >
-                    Send
-                  </button>
-                  <button
-                    id="savebtn"
-                    onClick={handleSave}
-                    title="Save to local file. This will not save the image; it saves a specification of the image that can be reloaded into this web app."
-                  >
-                    Save
-                  </button>
-                  <button title="Load image specification from a local file. File load cannot be undone.">
-                    Load
-                  </button>
-                </p>
+              {/* <!-- Drawing controls --> */}
+              <td class="w-full md:w-1/3 bg-gray-200 p-4">
+                <div class="flex flex-col w-1/2">
+                  <div class="grid grid-cols-2 gap-4">
+                    {/* <!-- Undo/Redo/Clear buttons --> */}
+                    <div class="flex flex-col space-y-2">
+                      <button
+                        id="undo"
+                        class="btn"
+                        onClick={undo}
+                        title="Remove the most recently drawn item. Can also undo Clear if used immediately after clearing."
+                      >
+                        Undo
+                      </button>
+                      <button
+                        id="redo"
+                        class="btn"
+                        onClick={redo}
+                        title="Restore the draw item that was removed most recently by Undo."
+                      >
+                        Redo
+                      </button>
+                      <button
+                        id="clear"
+                        class="btn"
+                        onClick={clearDrawing}
+                        title="Clear the current image. This can be undone if you click 'Undo' immediately after clearing."
+                      >
+                        Clear
+                      </button>
+                    </div>
+                    {/* <!-- Save button and Show Grid checkbox --> */}
+                    <div class="flex flex-col space-y-2">
+                      <button
+                        id="savebtn"
+                        class="btn bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                        onClick={handleSave}
+                      >
+                        Send
+                      </button>
+                      <label for="showGridCB" class="text-white">
+                        <input
+                          // type="checkbox"
+                          onChange={drawGrid}
+                          id="showGridCB"
+                          class="mr-2"
+                        />
+                        Show Grid
+                      </label>
+                    </div>
+                  </div>
+                </div>
               </td>
-              <td valign="top" bgcolor="#DDDDDD">
-                <p>
-                  <b>Tool:</b>
-                  <br />
-                  {[0, 1, 2, 3, 4, 5].map((tool) => (
-                    <label key={tool}>
-                      <input
-                        type="radio"
-                        name="tool"
-                        value={tool}
-                        id={`t${tool}`}
-                        onClick={() => selectTool(tool)}
-                        checked={currentToolRef.current === tool}
-                      />
-                      {tool === 5 ? "Freehand" : ` Tool ${tool}`}
-                    </label>
-                  ))}
-                </p>
-                <p>
-                  <b>Line Width:</b>
-                  <br />
-                  {[1, 2, 3, 4, 5, 10, 20].map((width) => (
-                    <label key={width}>
-                      <input
-                        type="radio"
-                        name="linewidth"
-                        value={width}
-                        id={`lw${width}`}
-                        onClick={() => selectLineWidth(width)}
-                        checked={currentLineWidthRef.current === width}
-                      />
-                      {width}
-                    </label>
-                  ))}
-                </p>
-                <p>
-                  <b>Color:</b>
-                  <br />
-                  {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((color) => (
-                    <label key={color}>
-                      <input
-                        type="radio"
-                        name="color"
-                        value={color}
-                        id={`c${color}`}
-                        onChange={drawGrid} // Change this
-                        onClick={() => selectColor(color)}
-                        checked={
-                          colors[currentColorRef.current] === colors[color]
-                        }
-                      />
-                      {color === 7 ? "Light Gray" : ` Color ${color}`}
-                    </label>
-                  ))}
-                </p>
+              {/* <!-- Tool, Line Width, and Color controls --> */}
+              <td class="w-full md:w-1/3 bg-gray-200 p-4">
+                <div class="grid grid-cols-3 gap-4 mt-4">
+                  <div>
+                    <p class="font-bold mb-2">Tool:</p>
+                    <div className="space-y-2">
+                      {[0, 1, 2, 3, 4, 5].map((tool) => (
+                        <label key={tool} className="flex items-center">
+                          <input
+                            type="radio"
+                            name="tool"
+                            value={tool}
+                            id={`t${tool}`}
+                            onClick={() => selectTool(tool)}
+                            className="mr-2"
+                          />
+                          <span>
+                            {tool === 0 && "Line"}
+                            {tool === 1 && "Rectangle"}
+                            {tool === 2 && "Oval"}
+                            {tool === 3 && "Filled Rect"}
+                            {tool === 4 && "Filled Oval"}
+                            {tool === 5 && "Freehand"}
+                          </span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <p class="font-bold mb-2">Line Width:</p>
+                    <div class="space-y-2">
+                      {[1, 2, 3, 4, 5, 10, 20].map((width) => (
+                        <label key={width} class="flex items-center">
+                          <input
+                            type="radio"
+                            name="linewidth"
+                            value={width}
+                            id={`lw${width}`}
+                            onClick={() => selectLineWidth(width)}
+                            class="mr-2"
+                          />
+                          <span>{width}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div>
+                    <p class="font-bold mb-2">Color:</p>
+                    <div className="space-y-2">
+                      {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((color) => (
+                        <label key={color} className="flex items-center">
+                          <input
+                            type="radio"
+                            name="color"
+                            value={color}
+                            id={`c${color}`}
+                            onClick={() => selectColor(color)}
+                            className="mr-2"
+                          />
+                          <span>
+                            {color === 0
+                              ? "Black"
+                              : color === 1
+                              ? "Red"
+                              : color === 2
+                              ? "Green"
+                              : color === 3
+                              ? "Blue"
+                              : color === 4
+                              ? "Gray"
+                              : color === 5
+                              ? "Purple"
+                              : color === 6
+                              ? "Yellow"
+                              : color === 7
+                              ? "Light Gray"
+                              : color === 8
+                              ? "Gray"
+                              : "Dark Gray"}
+                          </span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                </div>
               </td>
             </tr>
           </tbody>
