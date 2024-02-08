@@ -6,7 +6,7 @@ const Canvas = React.forwardRef((props, ref) => {
   return <canvas ref={ref} {...props} />;
 });
 
-const MyDrawingApp = () => {
+const Frieze = () => {
   const canvasRef=useRef(null);
   const OcanvasRef=useRef(null);
   
@@ -64,6 +64,28 @@ const MyDrawingApp = () => {
 
   }, []);
 
+  const getImage = () => {
+    const canvas = canvasRef.current;
+  
+    if (!canvas) {
+      console.error('Canvas reference is not available');
+      return null; // or handle the error in some way
+    }
+  
+    const context = canvas.getContext('2d');
+  
+    if (!context) {
+      console.error('2D context is not available');
+      return null; // or handle the error in some way
+    }
+  
+    const dataURL = canvas.toDataURL('image/png'); // You can change the format if needed
+  
+    const image = new Image();
+    image.src = dataURL;
+  
+    return image;
+  };
   
 
   const checkInput = () => {
@@ -654,5 +676,5 @@ const draw = () => {
     };
     
 
-    export default MyDrawingApp;
+    export default Frieze;
     
