@@ -1,8 +1,41 @@
-# React + Vite
+# Major Project : Algorithm Approach to Carpet Design
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Generate Persian Oriental rugs using artificial intelligence models such as DCGAN, Pix2Pix, and SE-Net.
 
-Currently, two official plugins are available:
+## Table of Contents
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- [About](#about)
+- [Getting Started](#getting-started)
+  - [Prerequisites](#prerequisites)
+  - [Installation](#installation)
+- [Usage](#usage)
+- [Contributing](#contributing)
+- [License](#license)
+
+## About
+
+Provide a brief overview of your project. What does it do? Why is it useful?
+
+## Getting Started
+
+### Prerequisites
+
+List any software or tools that users need to have installed before they can use your project.
+
+### Installation
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/your-username/your-repository.git
+
+### Installation
+
+   ```bash
+
+npm install
+
+### Installation
+
+   ```bash
+
+npm run dev
