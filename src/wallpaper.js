@@ -51,13 +51,13 @@ const DrawingCanvas = () => {
 
   const checkInputs = () => {
     let newT1, newT2, newRO;
-    newT1 = Number(translation1.current.value.trim());
+    newT1 = Number(translation1.current.trim());
     if (isNaN(newT1) || newT1 < 30 || newT1 > 400) {
       errorRef.current = "Translation must be a number, 30 to 400. Change not applied!";
       return false;
     }
     if (groupNum.current === 1 || groupNum.current === 5) {
-      newRO = Number(rowOffsetRef.current.value.trim());
+      newRO = Number(rowOffsetRef.current.trim());
       if (isNaN(newRO)) {
         errorRef.current = "Row Offset must be a number. Change not applied!";
         return false;
@@ -67,7 +67,7 @@ const DrawingCanvas = () => {
       if (newRO > newT1 / 2) newRO -= newT1;
     }
     if (groupNum.current < 10) {
-      newT2 = Number(translation2.current.value.trim());
+      newT2 = Number(translation2.current.trim());
       if (isNaN(newT2) || newT2 < 30 || newT2 > 400) {
         errorRef.current = "2nd Translation must be a number, 30 to 400. Change not applied!";
         return false;

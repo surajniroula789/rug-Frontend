@@ -319,50 +319,51 @@ function installMouser(theCanvas) {
 
 
 const drawGrid=()=> {
-    // graphics.lineWidth = 1;
-    // graphics.lineCap = "butt";
-    // graphics.globalAlpha = 0.5;
-    // for (var i = 0; i < 2; i++) {
-    //     graphics.save();
-    //     if (i == 1) {
-    //         graphics.strokeStyle = "black";
-    //         graphics.translate(0.5,0.5);
-    //     }
-    //     else {
-    //         graphics.strokeStyle = "white";
-    //         graphics.translate(-0.5,-0.5);
-    //     }
-    //     var w = canvas.width;
-    //     var h = canvas.height;
-    //     if (rotationCount == 1) {
-    //         if (reflection) {
-    //             graphics.strokeLine(w/2,0,w/2,h);
-    //         }
-    //     }
-    //     else {
-    //         var da = 2*Math.PI/rotationCount;
-    //         graphics.save();
-    //         for (var j = 0; j < rotationCount; j++) { 
-    //             graphics.strokeLine(w/2,h/2,w/2,-h);
-    //             graphics.translate(w/2,h/2);
-    //             graphics.rotate(da);
-    //             graphics.translate(-w/2,-h/2);
-    //         }
-    //         graphics.restore();
-    //         //if (reflection && rotationCount % 2 == 1) {
-    //         //    graphics.save();
-    //         //    for (var j = 0; j < rotationCount; j++) { 
-    //         //        graphics.strokeLine(w/2,h/2,w/2,2*h);
-    //         //        graphics.translate(w/2,h/2);
-    //         //        graphics.rotate(da);
-    //         //        graphics.translate(-w/2,-h/2);
-    //         //    }
-    //         //    graphics.restore();
-    //         //}
-    //     }
-    //     graphics.restore();
-    // }
-    // graphics.globalAlpha = 1.0;
+    let graphics  = canvasRef.current.getContext("2d");
+    graphics.lineWidth = 1;
+    graphics.lineCap = "butt";
+    graphics.globalAlpha = 0.5;
+    for (var i = 0; i < 2; i++) {
+        graphics.save();
+        if (i == 1) {
+            graphics.strokeStyle = "black";
+            graphics.translate(0.5,0.5);
+        }
+        else {
+            graphics.strokeStyle = "white";
+            graphics.translate(-0.5,-0.5);
+        }
+        var w = canvas.width;
+        var h = canvas.height;
+        if (rotationCount == 1) {
+            if (reflection) {
+                graphics.strokeLine(w/2,0,w/2,h);
+            }
+        }
+        else {
+            var da = 2*Math.PI/rotationCount;
+            graphics.save();
+            for (var j = 0; j < rotationCount; j++) { 
+                graphics.strokeLine(w/2,h/2,w/2,-h);
+                graphics.translate(w/2,h/2);
+                graphics.rotate(da);
+                graphics.translate(-w/2,-h/2);
+            }
+            graphics.restore();
+            //if (reflection && rotationCount % 2 == 1) {
+            //    graphics.save();
+            //    for (var j = 0; j < rotationCount; j++) { 
+            //        graphics.strokeLine(w/2,h/2,w/2,2*h);
+            //        graphics.translate(w/2,h/2);
+            //        graphics.rotate(da);
+            //        graphics.translate(-w/2,-h/2);
+            //    }
+            //    graphics.restore();
+            //}
+        }
+        graphics.restore();
+    }
+    graphics.globalAlpha = 1.0;
 }
 
 
