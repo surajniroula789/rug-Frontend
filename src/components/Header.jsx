@@ -9,7 +9,6 @@ const Header = () => {
         <div className="flex flex-wrap justify-between items-center mx-auto max-w-screen-xl">
           <Link to="/" className="flex items-center">
             <h1 className="pr-3 text-lg uppercase">Galaincha-Design </h1>
-            {/* <img src={logo} className="mr-3 h-12" alt="Logo" /> */}
           </Link>
           <div className="flex items-center lg:order-2">
             <Link
@@ -42,43 +41,63 @@ const Header = () => {
               </li>
               <li>
                 <NavLink
-                  to="/design"
+                  to="/rossette"
                   className={() =>
                     `block py-2 pr-4 pl-3 duration-200 border-b border-gray-100 hover:bg-gray-50 lg:hover:bg-transparent lg:border-0 hover:text-orange-700 lg:p-0`
                   }
                 >
-                  Design
+                  Centre
                 </NavLink>
               </li>
 
               <li>
                 <NavLink
-                  to="/contact"
+                  to="/walpaper"
                   className={() =>
                     `block py-2 pr-4 pl-3 duration-200 border-b border-gray-100 hover:bg-gray-50 lg:hover:bg-transparent lg:border-0 hover:text-orange-700 lg:p-0`
                   }
                 >
-                  Contact
+                  Walpaper
                 </NavLink>
               </li>
               <li>
                 <NavLink
-                  to="/demo"
+                  to="/canvas"
                   className={() =>
                     `block py-2 pr-4 pl-3 duration-200 border-b border-gray-100 hover:bg-gray-50 lg:hover:bg-transparent lg:border-0 hover:text-orange-700 lg:p-0`
                   }
                 >
-                  Demo
+                  Canvas
                 </NavLink>
               </li>
               <li>
                 <NavLink
-                  to="/final"
+                  to="/c-rosette"
                   className={() =>
                     `block py-2 pr-4 pl-3 duration-200 border-b border-gray-100 hover:bg-gray-50 lg:hover:bg-transparent lg:border-0 hover:text-orange-700 lg:p-0`
                   }
                 >
-                  Final
+                  C-Rosette
+                </NavLink>
+              </li>
+              <li>
+                <NavLink
+                  to="/c-wall"
+                  className={() =>
+                    `block py-2 pr-4 pl-3 duration-200 border-b border-gray-100 hover:bg-gray-50 lg:hover:bg-transparent lg:border-0 hover:text-orange-700 lg:p-0`
+                  }
+                >
+                  C-wallpaper
+                </NavLink>
+              </li>
+              <li>
+                <NavLink
+                  to="/combined"
+                  className={() =>
+                    `block py-2 pr-4 pl-3 duration-200 border-b border-gray-100 hover:bg-gray-50 lg:hover:bg-transparent lg:border-0 hover:text-orange-700 lg:p-0`
+                  }
+                >
+                  Combined
                 </NavLink>
               </li>
             </ul>

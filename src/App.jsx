@@ -1,11 +1,12 @@
 import { BrowserRouter, Outlet, Route, Routes } from "react-router-dom";
 import Header from "./components/Header";
-import Contact from "./components/Contact";
 import Home from "./components/Home";
-import Footer from "./components/Footer";
-import Design from "./components/Design";
-import CarpetDesigner from "./components/Demo";
-import FinalDesign from "./components/FinalDesign";
+import Rossette from "./components/rosette";
+import Walpaper from "./components/Walpaper";
+import Canvas from "./components/Canvas";
+import CanvasWallpaper from "./components/CanvasWalpaper";
+import CombinedCanvas from "./components/CombinedCanvas";
+import CanvasRosette from "./components/CanvasRosette";
 
 function App() {
   return (
@@ -14,11 +15,12 @@ function App() {
         <Route path="/" element={<Header />} />
         <Route index element={<Home />} />
         <Route path="home" element={<Home />} />
-        <Route path="design" element={<Design />} />
-        <Route path="contact" element={<Contact />} />
-        <Route path="footer" element={<Footer />} />
-        <Route path="demo" element={<CarpetDesigner />} />
-        <Route path="final" element={<FinalDesign />} />
+        <Route path="rossette" element={<Rossette />} />
+        <Route path="walpaper" element={<Walpaper />} />
+        <Route path="canvas" element={<Canvas />} />
+        <Route path="c-rosette" element={<CanvasRosette />} />
+        <Route path="c-wall" element={<CanvasWallpaper />} />
+        <Route path="combined" element={<CombinedCanvas />} />
       </Routes>
     </BrowserRouter>
   );
