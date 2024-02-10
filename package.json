@@ -11,11 +11,15 @@
   },
   "dependencies": {
     "@types/react-router-dom": "^5.3.3",
-    "konva": "^9.3.0",
+    "konva": "^9.3.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-draggable": "^4.4.6",
     "react-konva": "^18.2.10",
-    "react-router-dom": "^6.20.1"
+    "react-modal": "^3.16.1",
+    "react-resizable": "^3.0.5",
+    "react-router-dom": "^6.20.1",
+    "react-sketch": "^0.5.1"
   },
   "devDependencies": {
     "@types/react": "^18.2.37",

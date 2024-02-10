@@ -1,3 +1,4 @@
+
 # Major Project : Algorithm Approach to Carpet Design
 
 Generate Persian Oriental rugs using artificial intelligence models such as DCGAN, Pix2Pix, and SE-Net.
