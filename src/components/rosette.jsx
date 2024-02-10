@@ -20,10 +20,10 @@ const Rossette = () => {
 
   const handleSave = () => {
     const canvas = canvasRef.current;
-    const dataURL = canvas.toDataURL(); // This will give you a base64-encoded PNG image
-    // Now you can do something with the dataURL, like saving it or displaying it
-    console.log(dataURL);
-    // Add your logic for saving or displaying the image here
+    const dataURL = canvas.toDataURL();
+    localStorage.setItem("rosetteImage", dataURL); // Store image data in local storage
+    // Navigate to the canvas page
+    navigate("/c-rosette");
   };
 
   const canvasRef = useRef(null);

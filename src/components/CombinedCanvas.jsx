@@ -1,4 +1,6 @@
+// CombinedCanvas.js
 import React, { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Header from "./Header";
 
 const Canvas = React.forwardRef((props, ref) => {
@@ -17,6 +19,7 @@ const CombinedCanvas = () => {
   const [dragOffsetX, setDragOffsetX] = useState(0);
   const [dragOffsetY, setDragOffsetY] = useState(0);
   const [scaleFactor, setScaleFactor] = useState(1);
+  const navigate = useNavigate(); // Use useNavigate instead of useHistory
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -136,6 +139,13 @@ const CombinedCanvas = () => {
     document.body.removeChild(link);
   };
 
+  const handleNextButtonClick = () => {
+    const canvas = canvasRef.current;
+    const dataURL = canvas.toDataURL(); // Get the image data URL
+    localStorage.setItem("combinedImage", dataURL); // Save combined image data to localStorage
+    navigate("/final"); // Navigate to the /final route
+  };
+
   return (
     <>
       <Header />
@@ -147,7 +157,6 @@ const CombinedCanvas = () => {
           defaultValue="100"
           onChange={handleResize}
           className="w-64 mb-0 h-3 rounded-full overflow-hidden cursor-pointer bg-gradient-to-r from-gray-200 to-blue-500"
-          // Add a gradient background color that changes from gray to blue
         />
       </div>
       <br />
@@ -166,9 +175,15 @@ const CombinedCanvas = () => {
       <div className="flex justify-center mt-4">
         <button
           onClick={handleSaveImage}
-          className="px-4 py-2 bg-blue-500 text-white rounded-md shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          className="px-4 py-2 bg-blue-500 text-white rounded-md shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 mr-4"
         >
           Save Image
+        </button>
+        <button
+          onClick={handleNextButtonClick}
+          className="px-4 py-2 bg-blue-500 text-white rounded-md shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400"
+        >
+          Next
         </button>
       </div>
     </>
