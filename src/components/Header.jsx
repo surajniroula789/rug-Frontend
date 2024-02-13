@@ -32,7 +32,7 @@ const Header = () => {
                     `block py-2 pr-4 pl-3 duration-200 border-b border-gray-100 hover:bg-gray-50 lg:hover:bg-transparent lg:border-0 hover:text-orange-700 lg:p-0`
                   }
                 >
-                  Centre
+                  Rosette
                 </NavLink>
               </li>
 
@@ -103,7 +103,7 @@ const Header = () => {
                     `block py-2 pr-4 pl-3 duration-200 border-b border-gray-100 hover:bg-gray-50 lg:hover:bg-transparent lg:border-0 hover:text-orange-700 lg:p-0`
                   }
                 >
-                  Combined
+                  Rose_Wall
                 </NavLink>
               </li>
               <li>
@@ -113,7 +113,17 @@ const Header = () => {
                     `block py-2 pr-4 pl-3 duration-200 border-b border-gray-100 hover:bg-gray-50 lg:hover:bg-transparent lg:border-0 hover:text-orange-700 lg:p-0`
                   }
                 >
-                  Final
+                  F_Rose&Wall
+                </NavLink>
+              </li>
+              <li>
+                <NavLink
+                  to="/finale"
+                  className={() =>
+                    `block py-2 pr-4 pl-3 duration-200 border-b border-gray-100 hover:bg-gray-50 lg:hover:bg-transparent lg:border-0 hover:text-orange-700 lg:p-0`
+                  }
+                >
+                  Generate
                 </NavLink>
               </li>
             </ul>
