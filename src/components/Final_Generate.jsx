@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import Header from "./Header";
+const backendUrl = "http://localhost:8000/send_me";
 
 const MergeImages = () => {
   const canvasRef = useRef(null);
@@ -99,6 +100,20 @@ const MergeImages = () => {
     link.click();
   };
 
+  const handleSend = async () => {
+    const canvas = canvasRef.current;
+    const data = canvas.toDataURL("image/png");
+    const response = await fetch(backendUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    localStorage.setItem("response", response);
+  };
+
   return (
     <div className="flex flex-col items-center">
       <Header />
@@ -125,6 +140,12 @@ const MergeImages = () => {
       </div>
       <div className="mt-4">
         <button
+          onClick={handleSend}
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+        >
+          Send Image
+        </button>
+        <button
           onClick={handleSaveImage}
           className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
         >
@@ -136,3 +157,4 @@ const MergeImages = () => {
 };
 
 export default MergeImages;
+``;
