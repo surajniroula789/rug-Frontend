@@ -117,7 +117,8 @@ const MergeImages = () => {
 
       if (response.ok) {
         // Handle successful response
-        console.log("Image sent successfully");
+        const responseData = await response.json();
+        console.log("Image sent successfully \n", responseData);
       } else {
         // Handle error response
         console.error("Error sending image");
