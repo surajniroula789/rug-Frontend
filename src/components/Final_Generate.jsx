@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import Header from "./Header";
-const backendUrl = "http://localhost:8000/send_me";
+const backendUrl = "http://localhost:8000/send_here/";
 
 const MergeImages = () => {
   const canvasRef = useRef(null);
@@ -91,24 +91,14 @@ const MergeImages = () => {
     setCombinedScaleFactor(scaleFactor);
   };
 
-  const handleSaveImage = () => {
-    const canvas = canvasRef.current;
-    const dataURL = canvas.toDataURL("image/png");
-    const link = document.createElement("a");
-    link.href = dataURL;
-    link.download = "merged_image.png";
-    link.click();
-  };
-
   const handleSend = async () => {
     const canvas = canvasRef.current;
-    const data = canvas.toDataURL("image/png");
+    const data = canvas.toDataURL("combinedImage/png");
+    let formData = new FormData(); //formdata object
+    formData.append("image", data); //append the values with key, value pair
     const response = await fetch(backendUrl, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
+      body: formData,
     });
 
     localStorage.setItem("response", response);
@@ -144,12 +134,6 @@ const MergeImages = () => {
           className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
         >
           Send Image
-        </button>
-        <button
-          onClick={handleSaveImage}
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-        >
-          Save as PNG
         </button>
       </div>
     </div>
