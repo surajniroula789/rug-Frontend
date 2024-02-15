@@ -90,20 +90,43 @@ const MergeImages = () => {
     const scaleFactor = parseFloat(event.target.value) / 100;
     setCombinedScaleFactor(scaleFactor);
   };
+  function dataURItoBlob(dataURI) {
+    const byteString = atob(dataURI.split(",")[1]);
+    const mimeString = dataURI.split(",")[0].split(":")[1].split(";")[0];
+    const ab = new ArrayBuffer(byteString.length);
+    const ia = new Uint8Array(ab);
+    for (let i = 0; i < byteString.length; i++) {
+      ia[i] = byteString.charCodeAt(i);
+    }
+    return new Blob([ab], { type: mimeString });
+  }
 
   const handleSend = async () => {
+    
     const canvas = canvasRef.current;
-    const data = canvas.toDataURL("combinedImage/png");
-    let formData = new FormData(); //formdata object
-    formData.append("image", data); //append the values with key, value pair
-    const response = await fetch(backendUrl, {
-      method: "POST",
-      body: formData,
-    });
+    const dataURL = canvas.toDataURL("image/png");
+    const blob = dataURItoBlob(dataURL);
+    let formData = new FormData();
+    formData.append("image", blob, "combinedImage.png");
 
-    localStorage.setItem("response", response);
+    try{
+      const response = await fetch(backendUrl, {
+        method: "POST",
+        body: formData,
+      });
+
+      if (response.ok) {
+        // Handle successful response
+        console.log("Image sent successfully");
+      } else {
+        // Handle error response
+        console.error("Error sending image");
+      }
+    } catch (error) {
+      console.error("Error sending image:", error);
+    }
   };
-
+  
   return (
     <div className="flex flex-col items-center">
       <Header />
