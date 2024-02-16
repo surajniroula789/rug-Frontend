@@ -275,9 +275,9 @@ const FriezeSymmetry = ({ onSend }) => {
 
   function doResize() {
     var rect = document.getElementById("frieze").getBoundingClientRect();
-    // canvasRef.current.width = rect.width;
-    canvasRef.current.width = 600;
-    canvasRef.current.height = 75;
+    canvasRef.current.width = rect.width;
+    // canvasRef.current.width = 900;
+    canvasRef.current.height = 50;
     OcanvasRef.current.width = canvasRef.current.width;
     OcanvasRef.current.height = canvasRef.current.height;
     drawAll();

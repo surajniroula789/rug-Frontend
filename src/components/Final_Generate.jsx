@@ -2,12 +2,14 @@ import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "./Header";
 import "../App.css";
+import JSZip from "jszip";
 
 const backendUrl = "http://localhost:8000/send_here/";
 
 const MergeImages = () => {
   const navigate = useNavigate();
   const canvasRef = useRef(null);
+  const fileInputRef = useRef(null);
   const [dragging, setDragging] = useState(false);
   const [dragStartX, setDragStartX] = useState(0);
   const [dragStartY, setDragStartY] = useState(0);
@@ -15,14 +17,15 @@ const MergeImages = () => {
   const [dragOffsetY, setDragOffsetY] = useState(0);
   const [combinedScaleFactor, setCombinedScaleFactor] = useState(1);
   const [sentImages, setSentImages] = useState([]);
-  const [selectedImageIndex, setSelectedImageIndex] = useState(null); // Track selected image index
-  const [imagesGenerated, setImagesGenerated] = useState(false); // Track if images have been generated
+  const [selectedImageIndex, setSelectedImageIndex] = useState(null);
+  const [imagesGenerated, setImagesGenerated] = useState(false);
+  const [downloadingZip, setDownloadingZip] = useState(false);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     const context = canvas.getContext("2d");
 
-    // Get image data from FinalCanvas
+    //  image from FinalCanvas
     const finalCanvasData = localStorage.getItem("combinedImage");
     const finalCanvasImage = new Image();
     finalCanvasImage.onload = () => {
@@ -36,7 +39,7 @@ const MergeImages = () => {
     };
     finalCanvasImage.src = finalCanvasData;
 
-    // Get image data from FirezeImage
+    //  image from FirezeImage
     const firezeCanvasData = localStorage.getItem("FirezeImage");
     const firezeCanvasImage = new Image();
     firezeCanvasImage.onload = () => {
@@ -70,7 +73,7 @@ const MergeImages = () => {
     const context = canvas.getContext("2d");
     context.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Get image data from FinalCanvas
+    //  image data from FinalCanvas
     const finalCanvasData = localStorage.getItem("combinedImage");
     const finalCanvasImage = new Image();
     finalCanvasImage.onload = () => {
@@ -84,7 +87,7 @@ const MergeImages = () => {
     };
     finalCanvasImage.src = finalCanvasData;
 
-    // Get image data from FirezeImage
+    //  image data from FirezeImage
     const firezeCanvasData = localStorage.getItem("FirezeImage");
     const firezeCanvasImage = new Image();
     firezeCanvasImage.onload = () => {
@@ -123,14 +126,11 @@ const MergeImages = () => {
       });
 
       if (response.ok) {
-        // Handle successful response
         const responseData = await response.json();
         console.log("Image sent successfully \n", responseData.urls);
-        // Update state to display sent images
         setSentImages(responseData.urls);
-        setImagesGenerated(true); // Set imagesGenerated to true when images are received
+        setImagesGenerated(true);
       } else {
-        // Handle error response
         console.error("Error sending image");
       }
     } catch (error) {
@@ -139,18 +139,101 @@ const MergeImages = () => {
   };
 
   const handleImageClick = (index) => {
-    // Toggle selected image
     setSelectedImageIndex(index === selectedImageIndex ? null : index);
+  };
+
+  const handleFileUpload = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const formData = new FormData();
+      formData.append("image", file);
+      uploadImage(formData);
+    }
+  };
+
+  const uploadImage = async (formData) => {
+    try {
+      const response = await fetch(backendUrl, {
+        method: "POST",
+        body: formData,
+      });
+
+      if (response.ok) {
+        const responseData = await response.json();
+        console.log("Image uploaded successfully \n", responseData.urls);
+        setSentImages(responseData.urls);
+        setImagesGenerated(true);
+      } else {
+        console.error("Error uploading image");
+      }
+    } catch (error) {
+      console.error("Error uploading image:", error);
+    }
   };
 
   const navigateTo = (path) => {
     navigate(path);
   };
 
+  const handleDownloadZip = () => {
+    setDownloadingZip(true);
+
+    const zip = new JSZip();
+    const promises = sentImages.map((imageUrl, index) => {
+      return fetch(imageUrl)
+        .then((response) => response.blob())
+        .then((blob) => {
+          zip.file(`image_${index + 1}.png`, blob);
+        })
+        .catch((error) => console.error("Error fetching image:", error));
+    });
+
+    Promise.all(promises).then(() => {
+      zip.generateAsync({ type: "blob" }).then((content) => {
+        const url = window.URL.createObjectURL(content);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "images.zip";
+        a.click();
+        setDownloadingZip(false);
+      });
+    });
+  };
+
   return (
     <>
       <Header />
       <div className="flex flex-col items-center">
+        <div className="flex items-center justify-center w-full mt-7 ">
+          <label className="w-64 flex flex-col items-center px-4 py-6 bg-white text-blue-500 rounded-lg tracking-wide uppercase border border-blue-500 cursor-pointer hover:bg-blue-500 hover:text-white">
+            <svg
+              className="w-8 h-8"
+              fill="currentColor"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 20 20"
+            >
+              <path
+                fillRule="evenodd"
+                d="M10 12a2 2 0 100-4 2 2 0 000 4z"
+                clipRule="evenodd"
+              ></path>
+              <path
+                fillRule="evenodd"
+                d="M10 3a7 7 0 00-7 7c0 3.038 2.462 5.5 5.5 5.5h2A5.5 5.5 0 0015 10a5.5 5.5 0 00-5.5-5.5zm0-2a9 9 0 100 18 9 9 0 000-18zM9 9h2v2H9V9z"
+                clipRule="evenodd"
+              ></path>
+            </svg>
+            <span className="mt-2 text-sm font-semibold">Upload Image</span>
+            <input
+              type="file"
+              accept="image/*"
+              ref={fileInputRef}
+              style={{ display: "none" }}
+              onChange={handleFileUpload}
+            />
+          </label>
+        </div>
+
         <div className="flex justify-center mt-4">
           <input
             type="range"
@@ -175,10 +258,19 @@ const MergeImages = () => {
         <div className="mt-4">
           <button
             onClick={handleSend}
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            className="ml-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
           >
             Send Image
           </button>
+          {imagesGenerated && (
+            <button
+              onClick={handleDownloadZip}
+              className="ml-4 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+              disabled={downloadingZip}
+            >
+              {downloadingZip ? "Downloading..." : "Download Zip"}
+            </button>
+          )}
         </div>
         {imagesGenerated && (
           <>
@@ -186,7 +278,6 @@ const MergeImages = () => {
               Generated Images
             </h2>
             <div className="flex flex-wrap justify-center mt-4">
-              {/* Display sent images */}
               {sentImages.map((imageUrl, index) => (
                 <img
                   key={index}
