@@ -19,8 +19,8 @@ function App() {
         <Route path="/" element={<Header />} />
         <Route index element={<Home />} />
         <Route path="home" element={<Home />} />
-        <Route path="rossette" element={<Rossette />} />
-        <Route path="walpaper" element={<Walpaper />} />
+        <Route path="rosette" element={<Rossette />} />
+        <Route path="wallpaper" element={<Walpaper />} />
         <Route path="fireze" element={<FriezeSymmetry />} />
         <Route path="canvas" element={<Canvas />} />
         <Route path="c-rosette" element={<CanvasRosette />} />

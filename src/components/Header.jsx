@@ -27,7 +27,7 @@ const Header = () => {
               </li>
               <li>
                 <NavLink
-                  to="/rossette"
+                  to="/rosette"
                   className={() =>
                     `block py-2 pr-4 pl-3 duration-200 border-b border-gray-100 hover:bg-gray-50 lg:hover:bg-transparent lg:border-0 hover:text-orange-700 lg:p-0`
                   }
@@ -38,7 +38,7 @@ const Header = () => {
 
               <li>
                 <NavLink
-                  to="/walpaper"
+                  to="/wallpaper"
                   className={() =>
                     `block py-2 pr-4 pl-3 duration-200 border-b border-gray-100 hover:bg-gray-50 lg:hover:bg-transparent lg:border-0 hover:text-orange-700 lg:p-0`
                   }
@@ -56,7 +56,7 @@ const Header = () => {
                   Fireze
                 </NavLink>
               </li>
-              <li>
+              {/* <li>
                 <NavLink
                   to="/canvas"
                   className={() =>
@@ -65,8 +65,8 @@ const Header = () => {
                 >
                   Canvas
                 </NavLink>
-              </li>
-              <li>
+              </li> */}
+              {/* <li>
                 <NavLink
                   to="/c-rosette"
                   className={() =>
@@ -75,8 +75,8 @@ const Header = () => {
                 >
                   C-Rosette
                 </NavLink>
-              </li>
-              <li>
+              </li> */}
+              {/* <li>
                 <NavLink
                   to="/c-wall"
                   className={() =>
@@ -85,7 +85,7 @@ const Header = () => {
                 >
                   C-wallpaper
                 </NavLink>
-              </li>
+              </li> */}
               <li>
                 <NavLink
                   to="/c-fireze"
@@ -106,7 +106,7 @@ const Header = () => {
                   Rose_Wall
                 </NavLink>
               </li>
-              <li>
+              {/* <li>
                 <NavLink
                   to="/final"
                   className={() =>
@@ -115,7 +115,7 @@ const Header = () => {
                 >
                   F_Rose&Wall
                 </NavLink>
-              </li>
+              </li> */}
               <li>
                 <NavLink
                   to="/finale"

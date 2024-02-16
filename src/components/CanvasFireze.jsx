@@ -145,46 +145,57 @@ const CanvasFireze = () => {
     const imageData = canvas.toDataURL();
     localStorage.setItem("FirezeImage", imageData);
     // Optionally, you can navigate to another page or perform other actions after storing the image locally
+    navigate("/finale");
+  };
+
+  const handleBackToFirezeClick = () => {
+    navigate("/fireze");
   };
 
   return (
     <>
-      <Header />
-      <div className="flex justify-center mt-5">
-        <input
-          type="range"
-          min="10"
-          max="200"
-          defaultValue="100"
-          onChange={handleResize}
-          className="w-64  mb-0 bg-gray-200 h-3 rounded-full overflow-hidden cursor-pointer"
-        />
-      </div>
+      <>
+        <Header />
 
-      <br />
+        <div className="flex justify-center mt-5 mb-7">
+          <input
+            type="range"
+            min="10"
+            max="200"
+            defaultValue="100"
+            onChange={handleResize}
+            className="w-64 mb-0 bg-gray-200 h-3 rounded-full overflow-hidden cursor-pointer"
+          />
+        </div>
 
-      <div className="flex justify-center items-center h-30">
-        <Canvas
-          ref={canvasRef}
-          // width={window.innerWidth}
-          width={CANVAS_WIDTH}
-          height={CANVAS_HEIGHT}
-          id="canvas"
-          onMouseDown={handleMouseDown}
-          onMouseMove={handleMouseMove}
-          onMouseUp={handleMouseUp}
-          onMouseLeave={handleMouseUp}
-        />
-      </div>
+        <div className="flex justify-center items-center h-30">
+          <Canvas
+            ref={canvasRef}
+            width={CANVAS_WIDTH}
+            height={CANVAS_HEIGHT}
+            id="canvas"
+            onMouseDown={handleMouseDown}
+            onMouseMove={handleMouseMove}
+            onMouseUp={handleMouseUp}
+            onMouseLeave={handleMouseUp}
+          />
+        </div>
 
-      <div className="flex justify-center mt-5">
-        <button
-          onClick={handleOkayButtonClick}
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-        >
-          Okay
-        </button>
-      </div>
+        <div className="flex justify-center mt-5">
+          <button
+            onClick={handleOkayButtonClick}
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          >
+            Okay
+          </button>
+          <button
+            onClick={handleBackToFirezeClick}
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ml-4"
+          >
+            Back to Fireze
+          </button>
+        </div>
+      </>
     </>
   );
 };

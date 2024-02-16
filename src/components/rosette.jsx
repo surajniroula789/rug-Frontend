@@ -10,20 +10,12 @@ const Rossette = () => {
   const navigate = useNavigate();
   const [canvasImage, setCanvasImage] = useState(null); // State to store the image data
 
-  const handleSend = () => {
-    const canvas = canvasRef.current;
-    const dataURL = canvas.toDataURL();
-    localStorage.setItem("rosetteImage", dataURL); // Store image data in local storage
-    // Navigate to the canvas page
-    navigate("/c-rosette");
-  };
-
   const handleSave = () => {
     const canvas = canvasRef.current;
     const dataURL = canvas.toDataURL();
     localStorage.setItem("rosetteImage", dataURL); // Store image data in local storage
     // Navigate to the canvas page
-    navigate("/c-rosette");
+    navigate("/combined");
   };
 
   const canvasRef = useRef(null);

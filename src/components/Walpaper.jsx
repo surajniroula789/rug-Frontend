@@ -1180,7 +1180,7 @@ const Walpaper = () => {
     const dataURL = canvas.toDataURL();
     localStorage.setItem("wallpaperImage", dataURL); // Store image data in local storage
     // Navigate to the canvas page
-    navigate("/c-wall");
+    navigate("/combined");
   };
 
   return (

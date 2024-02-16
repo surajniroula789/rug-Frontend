@@ -1,3 +1,109 @@
 .output {
   border: 2px dotted red;
 }
+
+.image-hover {
+  transition: transform 0.3s ease-in-out;
+}
+
+.image-hover:hover {
+  transform: scale(1.1);
+}
+
+/* Final_Generate.module.css */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.range-input {
+  width: 80%;
+  margin-top: 20px;
+}
+
+.canvas-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.canvas {
+  border: 2px solid black;
+}
+
+.send-button {
+  background-color: #4caf50; /* Green */
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin-top: 20px;
+  cursor: pointer;
+}
+
+.send-button:hover {
+  background-color: #45a049;
+}
+
+.generated-images {
+  text-align: center;
+  margin-top: 30px;
+}
+
+.generated-images h2 {
+  font-size: 24px;
+  font-weight: bold;
+  color: #1e90ff; /* Dodger Blue */
+  border-bottom: 4px solid #1e90ff; /* Dodger Blue */
+  padding-bottom: 10px;
+  box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.5);
+  border-radius: 10px;
+}
+
+.image-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.generated-image {
+  max-width: 200px;
+  max-height: 200px;
+  margin: 10px;
+  cursor: pointer;
+  transition: border 0.3s ease;
+}
+
+.generated-image:hover {
+  border: 2px solid #1e90ff; /* Dodger Blue */
+}
+
+.navigation-buttons {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  margin-top: 30px;
+}
+
+.navigation-button {
+  background-color: #ffd700; /* Gold */
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin-top: 20px;
+  cursor: pointer;
+}
+
+.navigation-button:hover {
+  background-color: #ffc700;
+}
