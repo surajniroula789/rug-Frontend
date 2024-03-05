@@ -1,8 +1,8 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from "react";
 
 const Canvas = React.forwardRef((props, ref) => {
-    return <canvas ref={ref} {...props} />;
-  });
+  return <canvas ref={ref} {...props} />;
+});
 
 const ParticleAnimation = () => {
   const canvasRef = useRef(null);
@@ -10,14 +10,14 @@ const ParticleAnimation = () => {
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    const c = canvas.getContext('2d');
+    const c = canvas.getContext("2d");
 
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 
     const mouse = {
       x: window.innerWidth / 2,
-      y: window.innerHeight / 2
+      y: window.innerHeight / 2,
     };
 
     const handleMouseMove = (event) => {
@@ -81,7 +81,7 @@ const ParticleAnimation = () => {
         particles.push(
           new Particle(x, y, 5, `hsl(${Math.abs(hue * 360)}, 50%, 50%)`, {
             x: Math.cos(radian * i) * 3,
-            y: Math.sin(radian * i) * 3
+            y: Math.sin(radian * i) * 3,
           })
         );
       }
@@ -91,7 +91,7 @@ const ParticleAnimation = () => {
 
     const animate = () => {
       requestAnimationFrame(animate);
-      c.fillStyle = 'rgba(0, 0, 0, 0.1)';
+      c.fillStyle = "rgba(0, 0, 0, 0.1)";
       c.fillRect(0, 0, canvas.width, canvas.height);
 
       particles.forEach((particle, i) => {
@@ -107,12 +107,12 @@ const ParticleAnimation = () => {
     animate();
     generateRing();
 
-    window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('resize', handleResize);
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("resize", handleResize);
 
     return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('resize', handleResize);
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("resize", handleResize);
     };
   }, []);
 

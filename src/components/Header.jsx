@@ -1,105 +1,40 @@
 import React from "react";
 import { Link, NavLink } from "react-router-dom";
-import logo from "../assets/images/logo.jpg";
 
 const Header = () => {
   return (
-    <header className="shadow sticky z-50 top-0">
-      <nav className="bg-white border-gray-200 px-4 lg:px-6 py-2.5">
+    <header className="shadow sticky z-50 top-0 bg-white">
+      <nav className="border-gray-200 px-4 lg:px-6 py-2.5">
         <div className="flex flex-wrap justify-between items-center mx-auto max-w-screen-xl">
           <Link to="/" className="flex items-center">
-            <h1 className="pr-3 text-lg uppercase">Galaincha-Design </h1>
+            <h1 className="pr-3 text-lg uppercase text-gray-800 font-semibold">
+              Galaincha-Design
+            </h1>
           </Link>
-          <div className="flex items-center lg:order-2">
-            <Link
-              to="#"
-              className="text-gray-800 hover:bg-gray-50 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-4 lg:px-5 py-2 lg:py-2.5 mr-2 focus:outline-none"
-            >
-              Log in
-            </Link>
-            <Link
-              to="#"
-              className="text-white bg-orange-700 hover:bg-orange-800 focus:ring-4 focus:ring-orange-300 font-medium rounded-lg text-sm px-4 lg:px-5 py-2 lg:py-2.5 mr-2 focus:outline-none"
-            >
-              Get started
-            </Link>
-          </div>
           <div
             className="hidden justify-between items-center w-full lg:flex lg:w-auto lg:order-1"
             id="mobile-menu-2"
           >
             <ul className="flex flex-col mt-4 font-medium lg:flex-row lg:space-x-8 lg:mt-0">
-              <li>
-                <NavLink
-                  to="/home"
-                  className={() =>
-                    `block py-2 pr-4 pl-3 duration-200 border-b border-gray-100 hover:bg-gray-50 lg:hover:bg-transparent lg:border-0 hover:text-orange-700 lg:p-0`
-                  }
-                >
-                  Home
-                </NavLink>
-              </li>
-              <li>
-                <NavLink
-                  to="/rossette"
-                  className={() =>
-                    `block py-2 pr-4 pl-3 duration-200 border-b border-gray-100 hover:bg-gray-50 lg:hover:bg-transparent lg:border-0 hover:text-orange-700 lg:p-0`
-                  }
-                >
-                  Centre
-                </NavLink>
-              </li>
-
-              <li>
-                <NavLink
-                  to="/walpaper"
-                  className={() =>
-                    `block py-2 pr-4 pl-3 duration-200 border-b border-gray-100 hover:bg-gray-50 lg:hover:bg-transparent lg:border-0 hover:text-orange-700 lg:p-0`
-                  }
-                >
-                  Wallpaper
-                </NavLink>
-              </li>
-              <li>
-                <NavLink
-                  to="/canvas"
-                  className={() =>
-                    `block py-2 pr-4 pl-3 duration-200 border-b border-gray-100 hover:bg-gray-50 lg:hover:bg-transparent lg:border-0 hover:text-orange-700 lg:p-0`
-                  }
-                >
-                  Canvas
-                </NavLink>
-              </li>
-              <li>
-                <NavLink
-                  to="/c-rosette"
-                  className={() =>
-                    `block py-2 pr-4 pl-3 duration-200 border-b border-gray-100 hover:bg-gray-50 lg:hover:bg-transparent lg:border-0 hover:text-orange-700 lg:p-0`
-                  }
-                >
-                  C-Rosette
-                </NavLink>
-              </li>
-              <li>
-                <NavLink
-                  to="/c-wall"
-                  className={() =>
-                    `block py-2 pr-4 pl-3 duration-200 border-b border-gray-100 hover:bg-gray-50 lg:hover:bg-transparent lg:border-0 hover:text-orange-700 lg:p-0`
-                  }
-                >
-                  C-wallpaper
-                </NavLink>
-              </li>
-              <li>
-                <NavLink
-                  to="/combined"
-                  className={() =>
-                    `block py-2 pr-4 pl-3 duration-200 border-b border-gray-100 hover:bg-gray-50 lg:hover:bg-transparent lg:border-0 hover:text-orange-700 lg:p-0`
-                  }
-                >
-                  Combined
-                </NavLink>
-              </li>
+              {[
+                { to: "/home", label: "Home" },
+                { to: "/rosette", label: "Rosette" },
+                { to: "/wallpaper", label: "Wallpaper" },
+                { to: "/fireze", label: "Fireze" },
+                { to: "/c-fireze", label: "C_Fireze" },
+                { to: "/combined", label: "Rose&Wallpaper" },
+                { to: "/finale", label: "Generate" },
+              ].map(({ to, label }) => (
+                <li key={to}>
+                  <NavLink
+                    to={to}
+                    className="block py-2 pr-4 pl-3 duration-200 border-b border-transparent hover:border-orange-500 lg:border-0 lg:p-0 lg:hover:bg-orange-50 lg:hover:text-orange-700"
+                    activeClassName="lg:bg-orange-50 lg:text-orange-700"
+                  >
+                    {label}
+                  </NavLink>
+                </li>
+              ))}
             </ul>
           </div>
         </div>
