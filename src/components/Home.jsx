@@ -15,7 +15,7 @@ const Home = () => {
             </div>
             <div className="md:7/12 lg:w-6/12">
               <h2 className="text-2xl text-gray-900 font-bold md:text-4xl">
-                we design the galainch
+              Get started with the Galaincha Design Partner
               </h2>
               <p className="mt-6 text-gray-600">Hello World</p>
               <p className="mt-4 text-gray-600">Let's Do It</p>

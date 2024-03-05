@@ -1,4 +1,6 @@
+// CombinedCanvas.js
 import React, { useEffect, useRef, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import Header from "./Header";
 
 const Canvas = React.forwardRef((props, ref) => {
@@ -17,6 +19,7 @@ const CombinedCanvas = () => {
   const [dragOffsetX, setDragOffsetX] = useState(0);
   const [dragOffsetY, setDragOffsetY] = useState(0);
   const [scaleFactor, setScaleFactor] = useState(1);
+  const navigate = useNavigate(); // Use useNavigate instead of useHistory
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -34,16 +37,22 @@ const CombinedCanvas = () => {
       img1.src = storedImage1;
     }
 
-    // Load and draw second image
-    const storedImage2 = localStorage.getItem("rosetteImage");
-    if (storedImage2) {
+    // Load and draw rosette image
+    const storedRosetteImage = localStorage.getItem("rosetteImage");
+    if (storedRosetteImage) {
       const img2 = new Image();
       img2.onload = () => {
         setImageWidth2(img2.width);
         setImageHeight2(img2.height);
-        context.drawImage(img2, 0, 0, img2.width, img2.height);
+        const canvas = canvasRef.current;
+        const context = canvas.getContext("2d");
+        const canvasCenterX = canvas.width / 2;
+        const canvasCenterY = canvas.height / 2;
+        const rosetteX = canvasCenterX - img2.width / 2;
+        const rosetteY = canvasCenterY - img2.height / 2;
+        context.drawImage(img2, rosetteX, rosetteY, img2.width, img2.height);
       };
-      img2.src = storedImage2;
+      img2.src = storedRosetteImage;
     }
   }, []);
 
@@ -91,15 +100,19 @@ const CombinedCanvas = () => {
     };
     img1.src = localStorage.getItem("wallpaperImage");
 
-    // Draw rosette image with resizing and dragging
+    // Draw rosette image with resizing and centering
     const img2 = new Image();
     img2.onload = () => {
       const scaledWidth2 = imageWidth2 * scaleFactor;
       const scaledHeight2 = imageHeight2 * scaleFactor;
 
-      // Calculate new position of the rosette image
-      const rosetteX = (canvas.width - scaledWidth2) / 2 + offsetX;
-      const rosetteY = (canvas.height - scaledHeight2) / 2 + offsetY;
+      // Calculate center of the canvas
+      const canvasCenterX = canvas.width / 2;
+      const canvasCenterY = canvas.height / 2;
+
+      // Calculate position to center the rosette image
+      const rosetteX = canvasCenterX - scaledWidth2 / 2 + offsetX;
+      const rosetteY = canvasCenterY - scaledHeight2 / 2 + offsetY;
 
       // Save the current context state
       context.save();
@@ -107,8 +120,8 @@ const CombinedCanvas = () => {
       // Create a clipping path in the shape of a circle
       context.beginPath();
       context.arc(
-        canvas.width / 2,
-        canvas.height / 2,
+        canvasCenterX,
+        canvasCenterY,
         Math.min(scaledWidth2, scaledHeight2) / 2,
         0,
         Math.PI * 2
@@ -125,20 +138,18 @@ const CombinedCanvas = () => {
     img2.src = localStorage.getItem("rosetteImage");
   };
 
-  const handleSaveImage = () => {
+  const handleNextButtonClick = () => {
     const canvas = canvasRef.current;
-    const dataURL = canvas.toDataURL("image/png");
-    const link = document.createElement("a");
-    link.download = "combined_image.png";
-    link.href = dataURL;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    const dataURL = canvas.toDataURL(); // Get the image data URL
+    localStorage.setItem("combinedImage", dataURL); // Save combined image data to localStorage
+    navigate("/finale"); // Navigate to the /finale route
   };
 
   return (
     <>
       <Header />
+      <h2 className="text-center mt-4 mb-4">Rosette & Wallpaper Canvas </h2>
+
       <div className="flex justify-center mt-11">
         <input
           type="range"
@@ -147,7 +158,6 @@ const CombinedCanvas = () => {
           defaultValue="100"
           onChange={handleResize}
           className="w-64 mb-0 h-3 rounded-full overflow-hidden cursor-pointer bg-gradient-to-r from-gray-200 to-blue-500"
-          // Add a gradient background color that changes from gray to blue
         />
       </div>
       <br />
@@ -165,10 +175,24 @@ const CombinedCanvas = () => {
       </div>
       <div className="flex justify-center mt-4">
         <button
-          onClick={handleSaveImage}
+          onClick={() => navigate("/wallpaper")}
+          className="px-4 py-2 mr-2 bg-blue-500 text-white rounded-md shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400"
+        >
+          Back to Wallpaper
+        </button>
+        <button
+          onClick={() => navigate("/rosette")}
           className="px-4 py-2 bg-blue-500 text-white rounded-md shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400"
         >
-          Save Image
+          Back to Rosette
+        </button>
+      </div>
+      <div className="flex justify-center mt-4">
+        <button
+          onClick={handleNextButtonClick}
+          className="px-4 py-2 bg-blue-500 text-white rounded-md shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400"
+        >
+          Next
         </button>
       </div>
     </>
