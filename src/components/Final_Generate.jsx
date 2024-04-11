@@ -6,7 +6,7 @@ import JSZip from "jszip";
 
 const backendUrl = "http://localhost:8000/send_here/";
 
-const MergeImages = () => {
+const FinalOutput = () => {
   const navigate = useNavigate();
   const canvasRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -96,11 +96,6 @@ const MergeImages = () => {
     firezeCanvasImage.src = firezeCanvasData;
   };
 
-  const handleResizeCombined = (event) => {
-    const scaleFactor = parseFloat(event.target.value) / 100;
-    setCombinedScaleFactor(scaleFactor);
-  };
-
   function dataURItoBlob(dataURI) {
     const byteString = atob(dataURI.split(",")[1]);
     const mimeString = dataURI.split(",")[0].split(":")[1].split(";")[0];
@@ -118,6 +113,7 @@ const MergeImages = () => {
     const blob = dataURItoBlob(dataURL);
     let formData = new FormData();
     formData.append("image", blob, "combinedImage.png");
+    formData.append("index", sentImages?.length ?? 0);
 
     try {
       const response = await fetch(backendUrl, {
@@ -128,7 +124,7 @@ const MergeImages = () => {
       if (response.ok) {
         const responseData = await response.json();
         console.log("Image sent successfully \n", responseData.urls);
-        setSentImages(responseData.urls);
+        setSentImages([...sentImages, ...responseData.urls]);
         setImagesGenerated(true);
       } else {
         console.error("Error sending image");
@@ -140,35 +136,6 @@ const MergeImages = () => {
 
   const handleImageClick = (index) => {
     setSelectedImageIndex(index === selectedImageIndex ? null : index);
-  };
-
-  const handleFileUpload = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      const formData = new FormData();
-      formData.append("image", file);
-      uploadImage(formData);
-    }
-  };
-
-  const uploadImage = async (formData) => {
-    try {
-      const response = await fetch(backendUrl, {
-        method: "POST",
-        body: formData,
-      });
-
-      if (response.ok) {
-        const responseData = await response.json();
-        console.log("Image uploaded successfully \n", responseData.urls);
-        setSentImages(responseData.urls);
-        setImagesGenerated(true);
-      } else {
-        console.error("Error uploading image");
-      }
-    } catch (error) {
-      console.error("Error uploading image:", error);
-    }
   };
 
   const navigateTo = (path) => {
@@ -200,51 +167,16 @@ const MergeImages = () => {
     });
   };
 
+  const loadMore = () => {
+    console.log("load");
+    handleSend();
+  };
+
   return (
     <>
       <Header />
       <div className="flex flex-col items-center">
-        <div className="flex items-center justify-center w-full mt-7 ">
-          <label className="w-64 flex flex-col items-center px-4 py-6 bg-white text-blue-500 rounded-lg tracking-wide uppercase border border-blue-500 cursor-pointer hover:bg-blue-500 hover:text-white">
-            <svg
-              className="w-8 h-8"
-              fill="currentColor"
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 20 20"
-            >
-              <path
-                fillRule="evenodd"
-                d="M10 12a2 2 0 100-4 2 2 0 000 4z"
-                clipRule="evenodd"
-              ></path>
-              <path
-                fillRule="evenodd"
-                d="M10 3a7 7 0 00-7 7c0 3.038 2.462 5.5 5.5 5.5h2A5.5 5.5 0 0015 10a5.5 5.5 0 00-5.5-5.5zm0-2a9 9 0 100 18 9 9 0 000-18zM9 9h2v2H9V9z"
-                clipRule="evenodd"
-              ></path>
-            </svg>
-            <span className="mt-2 text-sm font-semibold">Upload Image</span>
-            <input
-              type="file"
-              accept="image/*"
-              ref={fileInputRef}
-              style={{ display: "none" }}
-              onChange={handleFileUpload}
-            />
-          </label>
-        </div>
-
-        <div className="flex justify-center mt-4">
-          <input
-            type="range"
-            min="10"
-            max="200"
-            defaultValue="100"
-            onChange={handleResizeCombined}
-            className="w-64 mb-0 bg-gray-200 h-3 rounded-full overflow-hidden cursor-pointer"
-          />
-        </div>
-        <div className="flex justify-center mt-4">
+        <div className="flex justify-center mt-16">
           <canvas
             ref={canvasRef}
             width={600}
@@ -260,7 +192,7 @@ const MergeImages = () => {
             onClick={handleSend}
             className="ml-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
           >
-            Send Image
+            Generate Image
           </button>
           {imagesGenerated && (
             <button
@@ -277,18 +209,23 @@ const MergeImages = () => {
             <h2 className="text-3xl font-bold mt-8 mb-4 text-center text-blue-600 border-b-4 border-blue-600 pb-2 shadow-lg rounded-lg">
               Generated Images
             </h2>
-            <div className="flex flex-wrap justify-center mt-4">
+            <div className="justify-center mt-4 image-container">
               {sentImages.map((imageUrl, index) => (
                 <img
                   key={index}
                   src={imageUrl}
                   alt={`Sent Image ${index + 1}`}
-                  className={`max-w-xs max-h-xs m-2 cursor-pointer image-hover
-          ${index === selectedImageIndex ? "border-2 border-blue-500" : ""}`}
+                  className={`max-h-xs m-5 cursor-pointer image-hover
+      ${index === selectedImageIndex ? "border-2 border-blue-500" : ""}`}
+                  width="600px"
+                  height="600px"
                   onClick={() => handleImageClick(index)}
                 />
               ))}
             </div>
+            <button className="bg-blue-500 p-5" onClick={loadMore}>
+              Want More Design
+            </button>
           </>
         )}
         <div className="flex justify-between w-full mt-4">
@@ -316,4 +253,4 @@ const MergeImages = () => {
   );
 };
 
-export default MergeImages;
+export default FinalOutput;

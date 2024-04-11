@@ -2,13 +2,31 @@
   border: 2px dotted red;
 }
 
+/* Add this CSS to your stylesheet */
+.image-container {
+  position: relative;
+}
+
 .image-hover {
-  transition: transform 0.3s ease-in-out;
+  transition: transform 0.2s ease-in-out;
 }
 
 .image-hover:hover {
-  transform: scale(1.1);
+  transform: scale(1.05);
+  position: relative;
+  z-index: 1; /* Ensure the hovered image stays on top */
 }
+
+/* Add this class to the container of your images */
+/* For example, wrap your images in a div with this class */
+
+/* .image-hover {
+  transition: transform 0.3s ease-in-out;
+} */
+/* 
+.image-hover:hover {
+  transform: scale(1.1);
+} */
 
 /* Final_Generate.module.css */
 

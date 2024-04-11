@@ -26,29 +26,26 @@ const Rossette = () => {
   const dragItemRef = useRef(null);
 
   // wallpaper specific
-  const currentColorRef = useRef("#000ff0");
-  const currentToolRef = useRef(2);
-  const currentLineWidthRef = useRef(3);
+  const currentColorRef = useRef("#000000");
+  const currentToolRef = useRef(5);
+  const currentLineWidthRef = useRef(5);
   const currentLineCapRef = useRef("round");
 
   const clearedItemsRef = useRef(null);
 
   const startingRef = useRef(true);
   const colors = [
-    "#000000",
-    "#FF0000",
-    "#00BB00",
+    "#FF0000", // Red
+    "#00BB00", // Green
+    "#00BBBB", // Purple
+    "#DD00DD", // Yellow
+    "#FFFF00", // Blue
     "#0000FF",
-    "#00BBBB",
-    "#DD00DD",
-    "#FFFF00",
-    "#DDDDDD",
-    "#999999",
-    "#555555",
+    "#000000", // Black
   ];
 
   const [FREEHAND_TOOL, setFreeHandTool] = useState(5);
-  const rotationCount = useRef(14);
+  const rotationCount = useRef(5);
   const reflection = useRef(false);
   const groupNum = useRef(11);
   const errorRef = useRef("");
@@ -332,8 +329,6 @@ const Rossette = () => {
     theCanvas.addEventListener("mousedown", doMouseDown);
   }
 
-  const drawGrid = () => {};
-
   // Convert the vanilla functions to React functions
   const selectLineWidth = (lineWidth) => {
     currentLineWidthRef.current = Number(lineWidth);
@@ -370,13 +365,13 @@ const Rossette = () => {
   const selectRotationCount = (count) => {
     if (count !== rotationCount.current) {
       rotationCount.current = count;
-      // You can add any additional logic here
+      drawAll();
     }
   };
 
   const doReflect = (reflect) => {
     reflection.current = reflect;
-    // You can add any additional logic here
+    drawAll();
   };
 
   const colorToName = {
@@ -477,225 +472,202 @@ const Rossette = () => {
     document.getElementById("undo").disabled = clearedItemsRef.current === null;
   };
 
+  const handleRotationChange = (value) => {
+    const count = parseInt(value); // Convert value to integer
+    selectRotationCount(count);
+  };
+
   return (
     <>
       <Header />
-      <div id="content">
-        <h2>
-          Rosette Symmetry
-          <br />
-          <span style={{ fontSize: "60%" }}>
-            (Rotation and Dihedral Groups)
+      <div id="content" class="container mx-auto p-4">
+        <h2 className="relative text-cente  font-semibold text-white mt-4 mb-7">
+          <span className="bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 px-4 py-2 rounded-lg">
+            Rosette Design
           </span>
         </h2>
-
-        <div className="flex justify-center items-center mb-12 ">
+        <div class="flex justify-center items-center mb-8">
           <Canvas
             ref={canvasRef}
             width={300}
             height={300}
             id="c1"
-            className="rounded-full border border-gray-500"
+            class="rounded-full border border-gray-500"
           />
         </div>
 
         <Canvas ref={OcanvasRef} width={300} height={300} id="c2" hidden />
 
-        <table border={0} cellPadding={5} cellSpacing={5} align="center">
-          <tbody>
-            <tr class="flex flex-wrap">
-              {/* <!-- Reflection and Rotations controls --> */}
-              <td class="w-full md:w-1/3 bg-gray-200 p-4">
-                <div class="space-y-4">
-                  <div>
-                    <label class="inline-flex items-center">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <td class="p-4 bg-gray-300">
+            <div>
+              <label class="flex items-center">
+                <input
+                  type="checkbox"
+                  id="reflectionCB"
+                  class="form-checkbox h-4 w-4 text-indigo-600"
+                  checked={reflection.current}
+                  onChange={(e) => doReflect(e.target.checked)}
+                />
+                <span class="ml-2 font-semibold">Reflection</span>
+              </label>
+            </div>
+            <div class="mt-4">
+              <p class="font-semibold">Rotations:</p>
+              <div class="mt-2">
+                {[...Array(20)].map((_, index) => {
+                  const value = index + 1;
+                  return (
+                    <label key={value} class="inline-flex items-center mr-6">
                       <input
-                        type="checkbox"
-                        id="reflectionCB"
-                        onChange={(e) => doReflect(e.target.checked)}
-                        checked={reflection.current}
-                        class="form-checkbox h-4 w-4 text-blue-500"
+                        type="radio"
+                        name="rotations"
+                        value={value}
+                        id={`r${value}`}
+                        class="form-radio h-4 w-4 text-indigo-600"
+                        checked={rotationCount.current === value}
+                        onChange={(e) => handleRotationChange(e.target.value)}
                       />
-                      <span class="ml-2">
-                        <b>Reflection</b>
+                      <span class="ml-2">{value === 1 ? "none" : value}</span>
+                    </label>
+                  );
+                })}
+              </div>
+            </div>
+          </td>
+
+          <div class="ml-40 bg-gray-200 p-6 rounded-lg shadow-md">
+            <div className="space-x-2">
+              <button
+                id="undo"
+                className="btn bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded"
+                onClick={undo}
+                title="Remove the most recently drawn item. Can also undo Clear if used immediately after clearing."
+              >
+                Undo
+              </button>
+              <button
+                id="redo"
+                className="btn bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded"
+                onClick={redo}
+                title="Restore the draw item that was removed most recently by Undo."
+              >
+                Redo
+              </button>
+              <button
+                id="clear"
+                className="btn bg-red-100-200 hover:bg-red-200-300 text-red-800 font-semibold py-2 px-4 rounded"
+                onClick={clearDrawing}
+                title="Clear the current image. This can be undone if you click 'Undo' immediately after clearing."
+              >
+                Clear
+              </button>
+              {/* save buttom */}
+
+              <button
+                id="savebtn"
+                className="btn bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                onClick={handleSave}
+              >
+                Send_to_Rostte_Canvas
+              </button>
+            </div>
+          </div>
+
+          <div class="ml-40 bg-gray-200 p-6 rounded-lg shadow-md">
+            <div class="grid grid-cols-3 gap-6">
+              <div>
+                <p class="font-semibold text-gray-800 mb-2">Tool:</p>
+                <div>
+                  {[...Array(6).keys()].map((tool) => (
+                    <label key={tool} class="flex items-center mb-2">
+                      <input
+                        type="radio"
+                        name="tool"
+                        value={tool}
+                        id={`t${tool}`}
+                        onClick={() => selectTool(tool)}
+                        class="mr-2"
+                        checked="checked"
+                      />
+                      <span class="text-gray-800">
+                        {
+                          [
+                            "Line",
+                            "Rectangle",
+                            "Oval",
+                            "Filled Rect",
+                            "Filled Oval",
+                            "Freehand",
+                          ][tool]
+                        }
                       </span>
                     </label>
-                  </div>
-                  <div>
-                    <p>
-                      <b>Rotations:</b>
-                    </p>
-                    <div class="grid grid-cols-3 gap-2">
-                      {[
-                        1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
-                        17, 18, 19, 20,
-                      ].map((num) => (
-                        <label key={num} class="flex items-center">
-                          <input
-                            type="radio"
-                            name="group"
-                            value={num}
-                            id={`g${num}`}
-                            onClick={() => selectGroup(num)}
-                            class="mr-2"
-                          />
-                          <span>{`p${num}`}</span>
-                        </label>
-                      ))}
-                    </div>
-                  </div>
+                  ))}
                 </div>
-              </td>
-              {/* <!-- Drawing controls --> */}
-              <td class="w-full md:w-1/3 bg-gray-200 p-4">
-                <div class="flex flex-col w-1/2">
-                  <div class="grid grid-cols-2 gap-4">
-                    {/* <!-- Undo/Redo/Clear buttons --> */}
-                    <div class="flex flex-col space-y-2">
-                      <button
-                        id="undo"
-                        class="btn"
-                        onClick={undo}
-                        title="Remove the most recently drawn item. Can also undo Clear if used immediately after clearing."
-                      >
-                        Undo
-                      </button>
-                      <button
-                        id="redo"
-                        class="btn"
-                        onClick={redo}
-                        title="Restore the draw item that was removed most recently by Undo."
-                      >
-                        Redo
-                      </button>
-                      <button
-                        id="clear"
-                        class="btn"
-                        onClick={clearDrawing}
-                        title="Clear the current image. This can be undone if you click 'Undo' immediately after clearing."
-                      >
-                        Clear
-                      </button>
-                    </div>
-                    {/* <!-- Save button and Show Grid checkbox --> */}
-                    <div class="flex flex-col space-y-2">
-                      <button
-                        id="savebtn"
-                        class="btn bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                        onClick={handleSave}
-                      >
-                        Send
-                      </button>
-                      <label for="showGridCB" class="text-white">
-                        <input
-                          // type="checkbox"
-                          onChange={drawGrid}
-                          id="showGridCB"
-                          class="mr-2"
-                        />
-                        Show Grid
-                      </label>
-                    </div>
-                  </div>
+              </div>
+              <div>
+                <p class="font-semibold text-gray-800 mb-2">Line Width:</p>
+                <div>
+                  {[1, 2, 3, 4, 5, 10].map((width) => (
+                    <label key={width} class="flex items-center mb-2">
+                      <input
+                        type="radio"
+                        name="linewidth"
+                        value={width}
+                        id={`lw${width}`}
+                        onClick={() => selectLineWidth(width)}
+                        class="mr-2"
+                        checked="checked"
+                      />
+                      <span class="text-gray-800">{width}</span>
+                    </label>
+                  ))}
                 </div>
-              </td>
-              {/* <!-- Tool, Line Width, and Color controls --> */}
-              <td class="w-full md:w-1/3 bg-gray-200 p-4">
-                <div class="grid grid-cols-3 gap-4 mt-4">
-                  <div>
-                    <p class="font-bold mb-2">Tool:</p>
-                    <div className="space-y-2">
-                      {[0, 1, 2, 3, 4, 5].map((tool) => (
-                        <label key={tool} className="flex items-center">
-                          <input
-                            type="radio"
-                            name="tool"
-                            value={tool}
-                            id={`t${tool}`}
-                            onClick={() => selectTool(tool)}
-                            className="mr-2"
-                          />
-                          <span>
-                            {tool === 0 && "Line"}
-                            {tool === 1 && "Rectangle"}
-                            {tool === 2 && "Oval"}
-                            {tool === 3 && "Filled Rect"}
-                            {tool === 4 && "Filled Oval"}
-                            {tool === 5 && "Freehand"}
-                          </span>
-                        </label>
-                      ))}
-                    </div>
-                  </div>
-                  <div>
-                    <p class="font-bold mb-2">Line Width:</p>
-                    <div class="space-y-2">
-                      {[1, 2, 3, 4, 5, 10, 20].map((width) => (
-                        <label key={width} class="flex items-center">
-                          <input
-                            type="radio"
-                            name="linewidth"
-                            value={width}
-                            id={`lw${width}`}
-                            onClick={() => selectLineWidth(width)}
-                            class="mr-2"
-                          />
-                          <span>{width}</span>
-                        </label>
-                      ))}
-                    </div>
-                  </div>
+              </div>
+              <div>
+                <p class="font-semibold text-gray-800 mb-2">Color:</p>
+                <div>
+                  {[...Array(7).keys()].map((color) => (
+                    <label key={color} class="flex items-center mb-2">
+                      <input
+                        type="radio"
+                        name="color"
+                        value={color}
+                        id={`c${color}`}
+                        onClick={() => selectColor(color)}
+                        class="mr-2"
+                        checked="checked"
+                      />
+                      <span class="text-gray-800">
+                        {
+                          [
+                            "Red",
+                            "Green",
+                            "Cyan",
+                            "Magenta",
+                            "Yellow",
+                            "Blue",
+                            "Black",
+                          ][color]
+                        }
+                      </span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
 
-                  <div>
-                    <p class="font-bold mb-2">Color:</p>
-                    <div className="space-y-2">
-                      {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((color) => (
-                        <label key={color} className="flex items-center">
-                          <input
-                            type="radio"
-                            name="color"
-                            value={color}
-                            id={`c${color}`}
-                            onClick={() => selectColor(color)}
-                            className="mr-2"
-                          />
-                          <span>
-                            {color === 0
-                              ? "Black"
-                              : color === 1
-                              ? "Red"
-                              : color === 2
-                              ? "Green"
-                              : color === 3
-                              ? "Blue"
-                              : color === 4
-                              ? "Gray"
-                              : color === 5
-                              ? "Purple"
-                              : color === 6
-                              ? "Yellow"
-                              : color === 7
-                              ? "Light Gray"
-                              : color === 8
-                              ? "Gray"
-                              : "Dark Gray"}
-                          </span>
-                        </label>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
         <p id="showGridCB"></p>
         <p id="error"></p>
+
         {canvasImage && (
           <img
             src={canvasImage}
             alt="Design"
-            className="mt-4 rounded border border-gray-500"
+            class="mt-8 rounded border border-gray-500"
           />
         )}
       </div>

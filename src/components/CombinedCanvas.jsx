@@ -145,9 +145,17 @@ const CombinedCanvas = () => {
     navigate("/finale"); // Navigate to the /finale route
   };
 
+  const clearAll = () => {
+    localStorage.setItem("wallpaperImage", null);
+    localStorage.setItem("rosetteImage", null);
+    window.location.reload();
+  };
+
   return (
     <>
       <Header />
+      <h2 className="text-center mt-4">Rosette & Wallpaper Canvas </h2>
+
       <div className="flex justify-center mt-11">
         <input
           type="range"
@@ -190,7 +198,15 @@ const CombinedCanvas = () => {
           onClick={handleNextButtonClick}
           className="px-4 py-2 bg-blue-500 text-white rounded-md shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400"
         >
-          Next
+          send to final design
+        </button>
+      </div>
+      <div className="flex justify-center items-center mt-4">
+        <button
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          onClick={clearAll}
+        >
+          Clear Drawing
         </button>
       </div>
     </>
