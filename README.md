@@ -33,3 +33,5 @@
 
 ### Prerequisite
 Ensure The Django Server is running in http://localhost:8000.
+The link to Django(api) is provided here:
+[Github](https://github.com/99-NinetyNine/GAN_rug_design/)
