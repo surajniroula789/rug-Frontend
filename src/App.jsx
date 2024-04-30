@@ -9,8 +9,7 @@ import CombinedCanvas from "./components/CombinedCanvas";
 import CanvasRosette from "./components/CanvasRosette";
 import FriezeSymmetry from "./components/Fireze";
 import CanvasFireze from "./components/CanvasFireze";
-import FinalDesign from "./components/FinalDesign";
-import MergeImages from "./components/Final_Generate";
+import FinalOutput from "./components/Final_Generate";
 
 function App() {
   return (
@@ -27,8 +26,7 @@ function App() {
         <Route path="c-wall" element={<CanvasWallpaper />} />
         <Route path="c-fireze" element={<CanvasFireze />} />
         <Route path="combined" element={<CombinedCanvas />} />
-        <Route path="final" element={<FinalDesign />} />
-        <Route path="finale" element={<MergeImages />} />
+        <Route path="finale" element={<FinalOutput />} />
       </Routes>
     </BrowserRouter>
   );

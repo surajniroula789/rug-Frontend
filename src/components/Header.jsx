@@ -20,10 +20,10 @@ const Header = () => {
                 { to: "/home", label: "Home" },
                 { to: "/rosette", label: "Rosette" },
                 { to: "/wallpaper", label: "Wallpaper" },
-                { to: "/fireze", label: "Frieze" },
-                { to: "/c-fireze", label: "Center Frieze" },
-                { to: "/combined", label: "Rose & Wallpaper" },
-                { to: "/finale", label: "Generate" },
+                { to: "/fireze", label: "Fireze" },
+                { to: "/c-fireze", label: "Edit Frieze" },
+                { to: "/combined", label: "Edit Rosette & Wallpaper" },
+                { to: "/finale", label: "Final Design" },
               ].map(({ to, label }) => (
                 <li key={to}>
                   <NavLink

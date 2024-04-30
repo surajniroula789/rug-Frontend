@@ -26,29 +26,26 @@ const Rossette = () => {
   const dragItemRef = useRef(null);
 
   // wallpaper specific
-  const currentColorRef = useRef("#000ff0");
-  const currentToolRef = useRef(2);
-  const currentLineWidthRef = useRef(3);
+  const currentColorRef = useRef("#000000");
+  const currentToolRef = useRef(5);
+  const currentLineWidthRef = useRef(5);
   const currentLineCapRef = useRef("round");
 
   const clearedItemsRef = useRef(null);
 
   const startingRef = useRef(true);
   const colors = [
-    "#000000",
-    "#FF0000",
-    "#00BB00",
+    "#FF0000", // Red
+    "#00BB00", // Green
+    "#00BBBB", // Purple
+    "#DD00DD", // Yellow
+    "#FFFF00", // Blue
     "#0000FF",
-    "#00BBBB",
-    "#DD00DD",
-    "#FFFF00",
-    "#DDDDDD",
-    "#999999",
-    "#555555",
+    "#000000", // Black
   ];
 
   const [FREEHAND_TOOL, setFreeHandTool] = useState(5);
-  const rotationCount = useRef(14);
+  const rotationCount = useRef(5);
   const reflection = useRef(false);
   const groupNum = useRef(11);
   const errorRef = useRef("");
@@ -368,13 +365,13 @@ const Rossette = () => {
   const selectRotationCount = (count) => {
     if (count !== rotationCount.current) {
       rotationCount.current = count;
-      // You can add any additional logic here
+      drawAll();
     }
   };
 
   const doReflect = (reflect) => {
     reflection.current = reflect;
-    // You can add any additional logic here
+    drawAll();
   };
 
   const colorToName = {
@@ -475,12 +472,19 @@ const Rossette = () => {
     document.getElementById("undo").disabled = clearedItemsRef.current === null;
   };
 
+  const handleRotationChange = (value) => {
+    const count = parseInt(value); // Convert value to integer
+    selectRotationCount(count);
+  };
+
   return (
     <>
       <Header />
       <div id="content" class="container mx-auto p-4">
-        <h2 class="text-center mt-8 mb-6 text-3xl font-bold text-gray-800">
-          Rosette Symmetry
+        <h2 className="relative text-cente  font-semibold text-white mt-4 mb-7">
+          <span className="bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 px-4 py-2 rounded-lg">
+            Rosette Design
+          </span>
         </h2>
         <div class="flex justify-center items-center mb-8">
           <Canvas
@@ -495,10 +499,44 @@ const Rossette = () => {
         <Canvas ref={OcanvasRef} width={300} height={300} id="c2" hidden />
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <td class="p-4 bg-gray-300">
+            <div>
+              <label class="flex items-center">
+                <input
+                  type="checkbox"
+                  id="reflectionCB"
+                  class="form-checkbox h-4 w-4 text-indigo-600"
+                  checked={reflection.current}
+                  onChange={(e) => doReflect(e.target.checked)}
+                />
+                <span class="ml-2 font-semibold">Reflection</span>
+              </label>
+            </div>
+            <div class="mt-4">
+              <p class="font-semibold">Rotations:</p>
+              <div class="mt-2">
+                {[...Array(20)].map((_, index) => {
+                  const value = index + 1;
+                  return (
+                    <label key={value} class="inline-flex items-center mr-6">
+                      <input
+                        type="radio"
+                        name="rotations"
+                        value={value}
+                        id={`r${value}`}
+                        class="form-radio h-4 w-4 text-indigo-600"
+                        checked={rotationCount.current === value}
+                        onChange={(e) => handleRotationChange(e.target.value)}
+                      />
+                      <span class="ml-2">{value === 1 ? "none" : value}</span>
+                    </label>
+                  );
+                })}
+              </div>
+            </div>
+          </td>
+
           <div class="ml-40 bg-gray-200 p-6 rounded-lg shadow-md">
-            <h3 class="text-lg font-semibold text-gray-700 mb-4">
-              Drawing Controls
-            </h3>
             <div className="space-x-2">
               <button
                 id="undo"
@@ -531,15 +569,12 @@ const Rossette = () => {
                 className="btn bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
                 onClick={handleSave}
               >
-                Send
+                Send_to_Rostte_Canvas
               </button>
             </div>
           </div>
 
           <div class="ml-40 bg-gray-200 p-6 rounded-lg shadow-md">
-            <h3 class="text-lg font-semibold text-gray-700 mb-4">
-              Tool, Line Width, and Color Controls
-            </h3>
             <div class="grid grid-cols-3 gap-6">
               <div>
                 <p class="font-semibold text-gray-800 mb-2">Tool:</p>
@@ -553,6 +588,7 @@ const Rossette = () => {
                         id={`t${tool}`}
                         onClick={() => selectTool(tool)}
                         class="mr-2"
+                        checked="checked"
                       />
                       <span class="text-gray-800">
                         {
@@ -573,7 +609,7 @@ const Rossette = () => {
               <div>
                 <p class="font-semibold text-gray-800 mb-2">Line Width:</p>
                 <div>
-                  {[1, 2, 3, 4, 5, 10, 20].map((width) => (
+                  {[1, 2, 3, 4, 5, 10].map((width) => (
                     <label key={width} class="flex items-center mb-2">
                       <input
                         type="radio"
@@ -582,6 +618,7 @@ const Rossette = () => {
                         id={`lw${width}`}
                         onClick={() => selectLineWidth(width)}
                         class="mr-2"
+                        checked="checked"
                       />
                       <span class="text-gray-800">{width}</span>
                     </label>
@@ -591,7 +628,7 @@ const Rossette = () => {
               <div>
                 <p class="font-semibold text-gray-800 mb-2">Color:</p>
                 <div>
-                  {[...Array(10).keys()].map((color) => (
+                  {[...Array(7).keys()].map((color) => (
                     <label key={color} class="flex items-center mb-2">
                       <input
                         type="radio"
@@ -600,20 +637,18 @@ const Rossette = () => {
                         id={`c${color}`}
                         onClick={() => selectColor(color)}
                         class="mr-2"
+                        checked="checked"
                       />
                       <span class="text-gray-800">
                         {
                           [
-                            "Black",
                             "Red",
                             "Green",
-                            "Blue",
-                            "Gray",
-                            "Purple",
+                            "Cyan",
+                            "Magenta",
                             "Yellow",
-                            "Light Gray",
-                            "Gray",
-                            "Dark Gray",
+                            "Blue",
+                            "Black",
                           ][color]
                         }
                       </span>

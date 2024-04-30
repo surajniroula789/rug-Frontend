@@ -64,30 +64,78 @@ const CanvasFireze = () => {
     const rightImage = new Image();
     const bottomImage = new Image();
     const leftImage = new Image();
-    const rightImageData = await rotateBase64Image(topImageData);
+
+    // Function to crop top image diagonally
+    const cropDiagonally = async (imageData) => {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.crossOrigin = "anonymous"; // Enable cross-origin resource sharing
+        img.onload = () => {
+          console.log("cropping diagonally");
+          const canvas = document.createElement("canvas");
+          canvas.width = img.width;
+          canvas.height = img.height;
+          const context = canvas.getContext("2d");
+
+          // Draw the image onto the canvas
+          //context.drawImage(img, 0, 0);
+
+          // Clear any existing content on the canvas
+          context.clearRect(0, 0, canvas.width, canvas.height);
+
+          // Draw the diagonal clipping path
+          context.beginPath();
+          context.moveTo(0, 0);
+          context.lineTo(canvas.height, canvas.height); // virtue of 45 degree
+          //context.closePath();
+
+          //context.beginPath()
+          context.lineTo(canvas.width - canvas.height, canvas.height); // virtue of 45 degree slope
+          context.lineTo(canvas.width, 0);
+          context.closePath();
+          context.clip();
+
+          // Draw the image again after clipping
+          context.drawImage(img, 0, 0);
+
+          // Resolve with the data URL of the cropped image
+          resolve(canvas.toDataURL());
+        };
+        img.onerror = reject;
+        img.src = imageData;
+      });
+    };
+
+    // Crop top image diagonally
+    const croppedTopImageData = await cropDiagonally(topImageData);
+    console.log(croppedTopImageData);
+
+    // Rotate cropped top image to obtain other images
+    const rightImageData = await rotateBase64Image(croppedTopImageData);
     const bottomImageData = await rotateBase64Image(rightImageData);
     const leftImageData = await rotateBase64Image(bottomImageData);
 
-    console.log(rightImageData);
-
     topImage.onload = function () {
       const canvas = document.createElement("canvas");
-      console.log(topImage.width);
-      canvas.width = topImage.width + topImage.height;
+      const ctx = canvas.getContext("2d");
+
+      // Set canvas size to fit the trapezium shape
+      canvas.width = topImage.width;
       canvas.height = canvas.width;
 
-      const context = canvas.getContext("2d");
+      // Draw the trapezium shape using the cropped top image
+      ctx.drawImage(topImage, 0, 0);
 
-      context.drawImage(topImage, 0, 0);
-      context.drawImage(rightImage, topImage.width, 0);
-      context.drawImage(bottomImage, topImage.height, topImage.width);
-      context.drawImage(leftImage, 0, topImage.height);
+      // Draw the other images at appropriate positions
+      ctx.drawImage(rightImage, canvas.width - topImage.height, 0);
+      ctx.drawImage(bottomImage, 0, canvas.height - topImage.height);
+      ctx.drawImage(leftImage, 0, 0); //topImage.height);
 
       const combinedBase64 = canvas.toDataURL();
       setCombinedImage(combinedBase64);
     };
 
-    topImage.src = topImageData;
+    topImage.src = croppedTopImageData;
     rightImage.src = rightImageData;
     bottomImage.src = bottomImageData;
     leftImage.src = leftImageData;
@@ -152,11 +200,16 @@ const CanvasFireze = () => {
     navigate("/fireze");
   };
 
+  const clearAll = () => {
+    localStorage.setItem("FirezeImage", null);
+    window.location.reload();
+  };
+
   return (
     <>
       <>
         <Header />
-        <h2 className="text-center mt-4 mb-4">Fireze Canvas </h2>
+        <h2 className="text-center font-medium mt-4 mb-4">Resize Fireze </h2>
 
         <div className="flex justify-center mt-5 mb-7">
           <input
@@ -187,13 +240,21 @@ const CanvasFireze = () => {
             onClick={handleOkayButtonClick}
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
           >
-            Okay
+            send_to_final_design
           </button>
           <button
             onClick={handleBackToFirezeClick}
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ml-4"
           >
             Back to Fireze
+          </button>
+        </div>
+        <div className="flex justify-center items-center mt-4">
+          <button
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            onClick={clearAll}
+          >
+            Clear Drawing
           </button>
         </div>
       </>

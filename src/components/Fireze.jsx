@@ -17,28 +17,22 @@ const groupToInt = {
   pma2: 6,
 };
 const colorToName = {
-  "#000000": "Black",
   "#FF0000": "Red",
   "#00BB00": "Green",
   "#0000FF": "Blue",
   "#00BBBB": "Cyan",
   "#DD00DD": "Magenta",
   "#FFFF00": "Yellow",
-  "#DDDDDD": "Light Gray",
-  "#999999": "Gray",
-  "#555555": "Dark Gray",
+  "#000000": "Black",
 };
 const nameToColor = {
-  Black: "#000000",
   Red: "#FF0000",
   Green: "#00BB00",
   Blue: "#0000FF",
   Cyan: "#00BBBB",
   Magenta: "#DD00DD",
   Yellow: "#FFFF00",
-  "#DDDDDD": "Light Gray",
-  "#999999": "Gray",
-  "#555555": "Dark Gray",
+  Black: "#000000",
 };
 const intToTool = [
   "Line",
@@ -57,16 +51,13 @@ const toolToInt = {
   Freehand: 5,
 };
 const colors = [
-  "#000000",
   "#FF0000",
   "#00BB00",
   "#0000FF",
   "#00BBBB",
   "#DD00DD",
   "#FFFF00",
-  "#DDDDDD",
-  "#999999",
-  "#555555",
+  "#000000",
 ];
 
 const FriezeSymmetry = ({ onSend }) => {
@@ -79,9 +70,9 @@ const FriezeSymmetry = ({ onSend }) => {
   const dragItemRef = useRef(null);
 
   // wallpaper specific
-  const currentColorRef = useRef("#000ff0");
-  const currentToolRef = useRef(2);
-  const currentLineWidthRef = useRef(3);
+  const currentColorRef = useRef("#000000");
+  const currentToolRef = useRef(5);
+  const currentLineWidthRef = useRef(5);
   const currentLineCapRef = useRef("round");
 
   const clearedItemsRef = useRef(null);
@@ -276,8 +267,9 @@ const FriezeSymmetry = ({ onSend }) => {
   function doResize() {
     var rect = document.getElementById("frieze").getBoundingClientRect();
     canvasRef.current.width = rect.width;
-    // canvasRef.current.width = 900;
     canvasRef.current.height = 128;
+    // canvasRef.current.height = 65;
+    // canvasRef.current.width = 600;
     OcanvasRef.current.width = canvasRef.current.width;
     OcanvasRef.current.height = canvasRef.current.height;
     drawAll();
@@ -574,12 +566,22 @@ const FriezeSymmetry = ({ onSend }) => {
     <>
       <Header />
       <div id="content">
-        <h2>Frieze Symmetry</h2>
+        <h2 className="relative text-center font-semibold text-white mt-4 mb-6">
+          <span className="bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 px-4 py-2 rounded-lg">
+            Frieze Design
+          </span>
+        </h2>
 
         <div id="frieze">
           <Canvas ref={canvasRef} width={500} id="c1" />
           <Canvas ref={OcanvasRef} height={128} id="c2" hidden />
         </div>
+        {/* <div className="flex items-center justify-center h-full">
+          <div id="frieze" className="flex items-center justify-center">
+            <Canvas ref={canvasRef} width={500} id="c1" />
+            <Canvas ref={OcanvasRef} height={128} id="c2" hidden />
+          </div>
+        </div> */}
 
         <label>
           <input
@@ -596,8 +598,6 @@ const FriezeSymmetry = ({ onSend }) => {
           <div className="ml-36 flex justify-between items-center bg-gray-200 p-4 rounded-lg shadow-md">
             {/* Undo/Redo/Clear Buttons */}
             <div className="space-x-2">
-              <b className="mb-6 block text-gray-700">Drawing Controls :</b>
-
               <button
                 className="px-4 py-2 text-black rounded-md shadow-md hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 mb-4"
                 id="undo"
@@ -626,10 +626,10 @@ const FriezeSymmetry = ({ onSend }) => {
 
               <button
                 id="savebtn"
-                className="px-4 py-2 text-black rounded-md shadow-md hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 mb-4"
+                className="px-4 py-2 text-black rounded-md bg-green-200 shadow-md hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 mb-4"
                 onClick={sendDesign}
               >
-                Send
+                Send to frieze
               </button>
             </div>
           </div>
@@ -687,6 +687,7 @@ const FriezeSymmetry = ({ onSend }) => {
                         id={`g${index}`}
                         onClick={() => selectGroup(index)}
                         className="form-radio"
+                        checked="checked"
                       />
                       <span>{group}</span>
                     </label>
@@ -708,6 +709,7 @@ const FriezeSymmetry = ({ onSend }) => {
                         id={`t${index}`}
                         onClick={() => selectTool(index)}
                         className="form-radio"
+                        checked="checked"
                       />
                       <span>{tool}</span>
                     </label>
@@ -717,7 +719,7 @@ const FriezeSymmetry = ({ onSend }) => {
               <td valign="top" className="pr-4">
                 <div className="mb-4">
                   <b className="block text-gray-700">Line Width:</b>
-                  {[1, 2, 3, 4, 5, 10, 20].map((width, index) => (
+                  {[1, 2, 3, 4, 5, 10].map((width, index) => (
                     <label
                       key={index}
                       className="flex items-center space-x-2 text-gray-700"
@@ -729,6 +731,7 @@ const FriezeSymmetry = ({ onSend }) => {
                         id={`lw${width}`}
                         onClick={() => selectLineWidth(width)}
                         className="form-radio"
+                        checked="checked"
                       />
                       <span>{width}</span>
                     </label>
@@ -750,6 +753,7 @@ const FriezeSymmetry = ({ onSend }) => {
                         id={`c${index}`}
                         onClick={() => selectColor(color)}
                         className="form-radio"
+                        checked="checked"
                       />
                       <span>{name}</span>
                     </label>

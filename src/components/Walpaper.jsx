@@ -20,37 +20,33 @@ const Walpaper = () => {
   // wallpaper specific
   const currentColorRef = useRef("#000000");
   const currentToolRef = useRef(5);
-  const currentLineWidthRef = useRef(3);
+  const currentLineWidthRef = useRef(5);
   const currentLineCapRef = useRef("round");
 
   const clearedItemsRef = useRef(null);
 
   const startingRef = useRef(true);
   const colors = [
-    "#000000",
-    "#FF0000",
-    "#00BB00",
-    "#0000FF",
-    "#00BBBB",
-    "#DD00DD",
-    "#FFFF00",
-    "#DDDDDD",
-    "#999999",
-    "#555555",
+    "#FF0000", // Red
+    "#00BB00", // Green
+    "#0000FF", // Blue
+    "#00BBBB", // Magenta
+    "#DD00DD", // Yellow
+    "#FFFF00", // Blue
+    "#000000", // Black
   ];
 
   const [FREEHAND_TOOL, setFreeHandTool] = useState(5);
   const translation1 = useRef(150);
   const translation2 = useRef(150);
   const rowOffsetRef = useRef(0);
-  const groupNum = useRef(11);
+  const groupNum = useRef(16);
   const errorRef = useRef("");
 
   useEffect(() => {
     installMouser(canvasRef.current);
     addExtraFunctionsToGraphics(canvasRef.current.getContext("2d"));
     addExtraFunctionsToGraphics(OcanvasRef.current.getContext("2d"));
-    console.log("hello");
 
     console.log(canvasRef.current);
   }, []);
@@ -1183,12 +1179,14 @@ const Walpaper = () => {
   return (
     <>
       <Header />
-      <div className="container mx-auto px-4">
-        <h2 className="text-center mt-8 mb-4 text-3xl font-semibold text-gray-800">
+      <h2 className="relative text-center  font-semibold text-white mt-4">
+        <span className="bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 px-4 py-2 rounded-lg">
           Wallpaper Symmetry
-        </h2>
+        </span>
+      </h2>
 
-        <div className="flex justify-center items-center mb-8">
+      <div class="container flex flex-row mt-16">
+        <div className="flex justify-center items-center mb-8 ml-40">
           <Canvas
             ref={canvasRef}
             width={600}
@@ -1236,6 +1234,7 @@ const Walpaper = () => {
                       id={`g${num}`}
                       onClick={() => selectGroup(num)}
                       className="mr-2"
+                      checked="checked"
                     />
                     <span>{`p${num}`}</span>
                   </label>
@@ -1282,7 +1281,7 @@ const Walpaper = () => {
                   className="btn bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
                   onClick={handleSave}
                 >
-                  Send
+                  Send_to_Wallpaper_Canvas
                 </button>
               </div>
             </div>
@@ -1309,6 +1308,7 @@ const Walpaper = () => {
                         id={`t${index}`}
                         onClick={() => selectTool(index)}
                         className="mr-2"
+                        checked="checked"
                       />
                       <span>{tool}</span>
                     </label>
@@ -1320,7 +1320,7 @@ const Walpaper = () => {
               <div>
                 <p className="font-semibold text-gray-800 mb-2">Line Width:</p>
                 <div className="space-y-2">
-                  {[1, 2, 3, 4, 5, 10, 20].map((width, index) => (
+                  {[1, 2, 3, 4, 5, 10].map((width, index) => (
                     <label key={index} className="flex items-center">
                       <input
                         type="radio"
@@ -1329,6 +1329,7 @@ const Walpaper = () => {
                         id={`lw${width}`}
                         onClick={() => selectLineWidth(width)}
                         className="mr-2"
+                        checked="checked"
                       />
                       <span>{width}</span>
                     </label>
@@ -1341,16 +1342,13 @@ const Walpaper = () => {
                 <p className="font-semibold text-gray-800 mb-2">Color:</p>
                 <div className="space-y-2">
                   {[
-                    "Black",
                     "Red",
                     "Green",
                     "Blue",
-                    "Gray",
-                    "Purple",
+                    "Cyan",
+                    "Magenta",
                     "Yellow",
-                    "Light Gray",
-                    "Gray",
-                    "Dark Gray",
+                    "Black",
                   ].map((color, index) => (
                     <label key={index} className="flex items-center">
                       <input
@@ -1360,6 +1358,7 @@ const Walpaper = () => {
                         id={`c${index}`}
                         onClick={() => selectColor(index)}
                         className="mr-2"
+                        checked="checked"
                       />
                       <span>{color}</span>
                     </label>
