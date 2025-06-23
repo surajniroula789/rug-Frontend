@@ -1,11 +1,15 @@
 import React, { useState, useRef, useEffect } from "react";
 import Header from "./Header";
+import { useNavigate } from "react-router-dom";
 
 const Canvas = React.forwardRef((props, ref) => {
-  return <canvas ref={ref} {...props} />;
+  return <canvas ref={ref} {...props} style={{ border: "2px solid black" }} />;
 });
 
 const Walpaper = () => {
+  const navigate = useNavigate();
+  const [canvasImage, setCanvasImage] = useState(null); // State to store the image data
+
   const canvasRef = useRef(null);
   const OcanvasRef = useRef(null);
 
@@ -16,37 +20,33 @@ const Walpaper = () => {
   // wallpaper specific
   const currentColorRef = useRef("#000000");
   const currentToolRef = useRef(5);
-  const currentLineWidthRef = useRef(3);
+  const currentLineWidthRef = useRef(5);
   const currentLineCapRef = useRef("round");
 
   const clearedItemsRef = useRef(null);
 
   const startingRef = useRef(true);
   const colors = [
-    "#000000",
-    "#FF0000",
-    "#00BB00",
-    "#0000FF",
-    "#00BBBB",
-    "#DD00DD",
-    "#FFFF00",
-    "#DDDDDD",
-    "#999999",
-    "#555555",
+    "#FF0000", // Red
+    "#00BB00", // Green
+    "#0000FF", // Blue
+    "#00BBBB", // Magenta
+    "#DD00DD", // Yellow
+    "#FFFF00", // Blue
+    "#000000", // Black
   ];
 
   const [FREEHAND_TOOL, setFreeHandTool] = useState(5);
   const translation1 = useRef(150);
   const translation2 = useRef(150);
   const rowOffsetRef = useRef(0);
-  const groupNum = useRef(11);
+  const groupNum = useRef(16);
   const errorRef = useRef("");
 
   useEffect(() => {
     installMouser(canvasRef.current);
     addExtraFunctionsToGraphics(canvasRef.current.getContext("2d"));
     addExtraFunctionsToGraphics(OcanvasRef.current.getContext("2d"));
-    console.log("wtf");
 
     console.log(canvasRef.current);
   }, []);
@@ -157,17 +157,14 @@ const Walpaper = () => {
     if (dragItemRef.current) {
       drawItem(canvasRef.current.getContext("2d"), dragItemRef.current);
     }
-    if (document.getElementById("showGridCB").checked) {
-      drawGrid();
-    }
+    // if (document.getElementById("showGridCB").checked) {
+    //   drawGrid();
+    // }
   };
 
   const drawItemToOSC = (item) => {
     drawItem(OcanvasRef.current.getContext("2d"), item);
     canvasRef.current.getContext("2d").drawImage(OcanvasRef.current, 0, 0);
-    if (document.getElementById("showGridCB").checked) {
-      drawGrid();
-    }
   };
 
   function drawItem(graphics, item) {
@@ -868,86 +865,86 @@ const Walpaper = () => {
     }
   }
 
-  function drawGrid(graphics) {
-    graphics.save();
-    graphics.lineWidth = 1;
-    graphics.lineCap = "butt";
-    graphics.globalAlpha = 0.5;
-    for (var i = 0; i < 2; i++) {
-      graphics.save();
-      if (i == 1) {
-        graphics.strokeStyle = "black";
-        graphics.translate(0.5, 0.5);
-      } else {
-        graphics.strokeStyle = "white";
-        graphics.translate(-0.5, -0.5);
-      }
-      var y, dy;
-      var w = canvasRef.current.width;
-      var h = canvasRef.current.height;
-      if (groupNum.current < 10) {
-        dy = translation2.current;
-      } else {
-        dy = translation1.current;
-      }
-      y = dy;
-      while (y < h) {
-        graphics.strokeLine(0, y, w, y);
-        y += dy;
-      }
-      var x, dx;
-      if (
-        groupNum.current < 13 &&
-        (rowOffsetRef.current == 0 ||
-          (groupNum.current != 1 && groupNum.current != 5))
-      ) {
-        x = dx = translation1.current;
-        while (x < w) {
-          graphics.strokeLine(x, 0, x, h);
-          x += dx;
-        }
-      } else if (groupNum.current < 13) {
-        // and rowOffsetRef.current is not 0 and groupNum.current is 1 or 5
-        var rows = h / translation2.current;
-        var offset;
-        if (rowOffsetRef.current <= translation1.current / 2)
-          offset = rows * rowOffsetRef.current;
-        else offset = rows * (rowOffsetRef.current - translation1.current);
-        dx = translation1.current;
-        if (offset > 0) {
-          x = 0;
-          while (x + offset > dx) x -= dx;
-          while (x < w) {
-            graphics.strokeLine(x, 0, x + offset, h);
-            x += dx;
-          }
-        } else {
-          x = dx;
-          while (x + offset < w) {
-            graphics.strokeLine(x, 0, x + offset, h);
-            x += dx;
-          }
-        }
-      } else {
-        var offset = h / Math.sqrt(3);
-        dx = (translation1.current * 2) / Math.sqrt(3);
-        x = 0;
-        while (x + offset > dx) x -= dx;
-        while (x < w) {
-          graphics.strokeLine(x, 0, x + offset, h);
-          x += dx;
-        }
-        offset = -offset;
-        x = dx;
-        while (x + offset < w) {
-          graphics.strokeLine(x, 0, x + offset, h);
-          x += dx;
-        }
-      }
-      graphics.restore();
-    }
-    graphics.restore();
-  }
+  // function drawGrid(graphics) {
+  //   graphics.save();
+  //   graphics.lineWidth = 1;
+  //   graphics.lineCap = "butt";
+  //   graphics.globalAlpha = 0.5;
+  //   for (var i = 0; i < 2; i++) {
+  //     graphics.save();
+  //     if (i == 1) {
+  //       graphics.strokeStyle = "black";
+  //       graphics.translate(0.5, 0.5);
+  //     } else {
+  //       graphics.strokeStyle = "white";
+  //       graphics.translate(-0.5, -0.5);
+  //     }
+  //     var y, dy;
+  //     var w = canvasRef.current.width;
+  //     var h = canvasRef.current.height;
+  //     if (groupNum.current < 10) {
+  //       dy = translation2.current;
+  //     } else {
+  //       dy = translation1.current;
+  //     }
+  //     y = dy;
+  //     while (y < h) {
+  //       graphics.strokeLine(0, y, w, y);
+  //       y += dy;
+  //     }
+  //     var x, dx;
+  //     if (
+  //       groupNum.current < 13 &&
+  //       (rowOffsetRef.current == 0 ||
+  //         (groupNum.current != 1 && groupNum.current != 5))
+  //     ) {
+  //       x = dx = translation1.current;
+  //       while (x < w) {
+  //         graphics.strokeLine(x, 0, x, h);
+  //         x += dx;
+  //       }
+  //     } else if (groupNum.current < 13) {
+  //       // and rowOffsetRef.current is not 0 and groupNum.current is 1 or 5
+  //       var rows = h / translation2.current;
+  //       var offset;
+  //       if (rowOffsetRef.current <= translation1.current / 2)
+  //         offset = rows * rowOffsetRef.current;
+  //       else offset = rows * (rowOffsetRef.current - translation1.current);
+  //       dx = translation1.current;
+  //       if (offset > 0) {
+  //         x = 0;
+  //         while (x + offset > dx) x -= dx;
+  //         while (x < w) {
+  //           graphics.strokeLine(x, 0, x + offset, h);
+  //           x += dx;
+  //         }
+  //       } else {
+  //         x = dx;
+  //         while (x + offset < w) {
+  //           graphics.strokeLine(x, 0, x + offset, h);
+  //           x += dx;
+  //         }
+  //       }
+  //     } else {
+  //       var offset = h / Math.sqrt(3);
+  //       dx = (translation1.current * 2) / Math.sqrt(3);
+  //       x = 0;
+  //       while (x + offset > dx) x -= dx;
+  //       while (x < w) {
+  //         graphics.strokeLine(x, 0, x + offset, h);
+  //         x += dx;
+  //       }
+  //       offset = -offset;
+  //       x = dx;
+  //       while (x + offset < w) {
+  //         graphics.strokeLine(x, 0, x + offset, h);
+  //         x += dx;
+  //       }
+  //     }
+  //     graphics.restore();
+  //   }
+  //   graphics.restore();
+  // }
 
   function doApply() {
     if (checkInputs()) {
@@ -1149,7 +1146,7 @@ const Walpaper = () => {
         return;
       }
 
-      document.getElementById("error").innerHTML = "&nbsp;";
+      // document.getElementById("error").innerHTML = "&nbsp;";
       theCanvas.addEventListener("mousemove", doMouseDrag);
       document.addEventListener("mouseup", doMouseUp);
 
@@ -1176,111 +1173,84 @@ const Walpaper = () => {
     const dataURL = canvas.toDataURL();
     localStorage.setItem("wallpaperImage", dataURL); // Store image data in local storage
     // Navigate to the canvas page
+    navigate("/combined");
   };
 
   return (
     <>
       <Header />
-      <div id="content">
-        <h2>Wallpaper Symmetry</h2>
+      <h2 className="relative text-center  font-semibold text-white mt-4">
+        <span className="bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 px-4 py-2 rounded-lg">
+          Wallpaper Symmetry
+        </span>
+      </h2>
 
-        <Canvas ref={canvasRef} width={800} height={600} id="c1" />
+      <div class="container flex flex-row mt-16">
+        <div className="flex justify-center items-center mb-8 ml-40">
+          <Canvas
+            ref={canvasRef}
+            width={600}
+            height={600}
+            id="c1"
+            className="rounded border border-gray-500"
+          />
+        </div>
+
         <Canvas ref={OcanvasRef} width={800} height={600} id="c2" hidden />
 
-        <table border={0} cellPadding={5} cellSpacing={5} align="center">
-          <tbody>
-            <tr>
-              <td colSpan={2}>
-                <span id="error">&nbsp;</span>
-              </td>
-            </tr>
-            <tr>
-              <td colSpan={3} bgcolor="#DDDDDD">
-                <label title="Horizontal translation in pixels, in the range 30 to 400. You must click Apply or press Enter for a change to take effect.">
-                  Translation Amount:{" "}
-                  <input
-                    onChange={checkForReturnKey}
-                    type="text"
-                    size={3}
-                    maxLength={3}
-                    value={translation1.current}
-                  />
-                </label>
-                <span
-                  id="trans2holder"
-                  style={{ marginLeft: "20px", display: "none" }}
-                >
-                  <label title="Vertical translation in pixels, in the range 30 to 400. You must click Apply or press Enter for a change to take effect.">
-                    2nd Translation:{" "}
+        <div className="mx-auto max-w-xl">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {/* Translation Amount */}
+            <div className="bg-gray-200 p-4 rounded-lg shadow-md">
+              <label
+                htmlFor="translation"
+                className="block mb-2 font-semibold text-gray-800"
+              >
+                Translation Amount:
+              </label>
+              <input
+                onChange={checkForReturnKey}
+                type="text"
+                id="translation"
+                size="3"
+                maxLength="3"
+                value={translation1.current}
+                className="border rounded px-2 py-1 w-16"
+              />
+            </div>
+
+            {/* Symmetry Group */}
+            <div className="bg-gray-200 p-4 rounded-lg shadow-md">
+              <p className="font-semibold text-gray-800 mb-2">
+                Symmetry Group:
+              </p>
+              <div className="grid grid-cols-3 gap-2">
+                {Array.from({ length: 17 }, (_, i) => i + 1).map((num) => (
+                  <label key={num} className="flex items-center">
                     <input
-                      onChange={checkForReturnKey}
-                      type="text"
-                      size={3}
-                      maxLength={3}
-                      value={translation2.current}
+                      type="radio"
+                      name="group"
+                      value={num}
+                      id={`g${num}`}
+                      onClick={() => selectGroup(num)}
+                      className="mr-2"
+                      checked="checked"
                     />
+                    <span>{`p${num}`}</span>
                   </label>
-                </span>
-                <span
-                  id="offsetholder"
-                  style={{ marginLeft: "20px", display: "none" }}
-                >
-                  <label title="Amount by which each row is offset horizontally from the previous row. Any value is equivalent to one between plus and minus Translation/2. You must click Apply or press Enter for a change to take effect.">
-                    Row Offset:{" "}
-                    <input
-                      onChange={checkForReturnKey}
-                      type="text"
-                      size={3}
-                      maxLength={4}
-                      value={rowOffsetRef.current}
-                    />
-                  </label>
-                </span>
-                <button
-                  style={{ marginLeft: "20px" }}
-                  onClick={doApply}
-                  title="Check input and if legal, apply to current image. You can also do this by pressing Enter in an input box."
-                >
-                  Apply
-                </button>
-              </td>
-            </tr>
-            <tr>
-              <td valign="top" bgcolor="#DDDDDD">
-                <p>
-                  <b>
-                    Symmetry
-                    <br />
-                    Group:
-                  </b>
-                  <br />
-                  <br />
-                  {[
-                    1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17,
-                  ].map((num) => (
-                    <label key={num}>
-                      <input
-                        type="radio"
-                        name="group"
-                        value={num}
-                        id={`g${num}`}
-                        onClick={() => selectGroup(num)}
-                      />
-                      {` p${num}`}
-                    </label>
-                  ))}
-                </p>
-              </td>
-              <td valign="top">
-                <button
-                  id="savebtn"
-                  onClick={undo}
-                  title="Remove the most recently drawn item. Can also undo Clear if used immediately after clearing."
-                >
-                  Undo
-                </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Drawing Controls */}
+          <div className="mt-8">
+            <div className="flex justify-between items-center bg-gray-200 p-4 rounded-lg shadow-md">
+              {/* Undo/Redo/Clear Buttons */}
+              <div className="space-x-2">
                 <button
                   id="undo"
+                  className="btn bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded"
                   onClick={undo}
                   title="Remove the most recently drawn item. Can also undo Clear if used immediately after clearing."
                 >
@@ -1288,6 +1258,7 @@ const Walpaper = () => {
                 </button>
                 <button
                   id="redo"
+                  className="btn bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded"
                   onClick={redo}
                   title="Restore the draw item that was removed most recently by Undo."
                 >
@@ -1295,81 +1266,108 @@ const Walpaper = () => {
                 </button>
                 <button
                   id="clear"
+                  className="btn bg-red-100-200 hover:bg-red-200-300 text-red-800 font-semibold py-2 px-4 rounded"
                   onClick={clearDrawing}
                   title="Clear the current image. This can be undone if you click 'Undo' immediately after clearing."
                 >
                   Clear
                 </button>
-                <input
-                  type="checkbox"
-                  onChange={drawGrid}
-                  id="showGridCB"
-                  style={{ marginLeft: "30px" }}
-                />
+              </div>
+
+              {/* Save Button */}
+              <div>
                 <button
                   id="savebtn"
+                  className="btn bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
                   onClick={handleSave}
-                  title="Save to local file. This will not save the image; it saves a specification of the image that can be reloaded into this web app."
                 >
-                  Save
+                  Send_to_Wallpaper_Canvas
                 </button>
-                <label htmlFor="showGridCB" style={{ color: "white" }}>
-                  Show Grid
-                </label>
-              </td>
-              <td valign="top" bgcolor="#DDDDDD">
-                <p>
-                  <b>Tool:</b>
-                  <br />
-                  {[0, 1, 2, 3, 4, 5].map((tool) => (
-                    <label key={tool}>
+              </div>
+            </div>
+
+            {/* Tool, Line Width, and Color Controls */}
+            <div className="grid grid-cols-3 gap-4 mt-4 bg-gray-200 p-4 rounded-lg shadow-md">
+              {/* Tool */}
+              <div>
+                <p className="font-semibold text-gray-800 mb-2">Tool:</p>
+                <div className="space-y-2">
+                  {[
+                    "Line",
+                    "Rectangle",
+                    "Oval",
+                    "Filled Rect",
+                    "Filled Oval",
+                    "Freehand",
+                  ].map((tool, index) => (
+                    <label key={index} className="flex items-center">
                       <input
                         type="radio"
                         name="tool"
-                        value={tool}
-                        id={`t${tool}`}
-                        onClick={() => selectTool(tool)}
+                        value={index}
+                        id={`t${index}`}
+                        onClick={() => selectTool(index)}
+                        className="mr-2"
+                        checked="checked"
                       />
-                      {` ${tool === 5 ? "Freehand" : ` Tool ${tool}`}`}
+                      <span>{tool}</span>
                     </label>
                   ))}
-                </p>
-                <p>
-                  <b>Line Width:</b>
-                  <br />
-                  {[1, 2, 3, 4, 5, 10, 20].map((width) => (
-                    <label key={width}>
+                </div>
+              </div>
+
+              {/* Line Width */}
+              <div>
+                <p className="font-semibold text-gray-800 mb-2">Line Width:</p>
+                <div className="space-y-2">
+                  {[1, 2, 3, 4, 5, 10].map((width, index) => (
+                    <label key={index} className="flex items-center">
                       <input
                         type="radio"
                         name="linewidth"
                         value={width}
                         id={`lw${width}`}
                         onClick={() => selectLineWidth(width)}
+                        className="mr-2"
+                        checked="checked"
                       />
-                      {` ${width}`}
+                      <span>{width}</span>
                     </label>
                   ))}
-                </p>
-                <p>
-                  <b>Color:</b>
-                  <br />
-                  {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((color) => (
-                    <label key={color}>
+                </div>
+              </div>
+
+              {/* Color */}
+              <div>
+                <p className="font-semibold text-gray-800 mb-2">Color:</p>
+                <div className="space-y-2">
+                  {[
+                    "Red",
+                    "Green",
+                    "Blue",
+                    "Cyan",
+                    "Magenta",
+                    "Yellow",
+                    "Black",
+                  ].map((color, index) => (
+                    <label key={index} className="flex items-center">
                       <input
                         type="radio"
                         name="color"
-                        value={color}
-                        id={`c${color}`}
-                        onClick={() => selectColor(color)}
+                        value={index}
+                        id={`c${index}`}
+                        onClick={() => selectColor(index)}
+                        className="mr-2"
+                        checked="checked"
                       />
-                      {` ${color === 7 ? "Light Gray" : ` Color ${color}`}`}
+                      <span>{color}</span>
                     </label>
                   ))}
-                </p>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </>
   );

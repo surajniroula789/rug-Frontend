@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Header from "./Header";
 
 const Canvas = React.forwardRef((props, ref) => {
@@ -6,21 +7,15 @@ const Canvas = React.forwardRef((props, ref) => {
 });
 
 const Rossette = () => {
+  const navigate = useNavigate();
   const [canvasImage, setCanvasImage] = useState(null); // State to store the image data
 
-  const handleSend = () => {
+  const handleSave = () => {
     const canvas = canvasRef.current;
     const dataURL = canvas.toDataURL();
     localStorage.setItem("rosetteImage", dataURL); // Store image data in local storage
     // Navigate to the canvas page
-  };
-
-  const handleSave = () => {
-    const canvas = canvasRef.current;
-    const dataURL = canvas.toDataURL(); // This will give you a base64-encoded PNG image
-    // Now you can do something with the dataURL, like saving it or displaying it
-    console.log(dataURL);
-    // Add your logic for saving or displaying the image here
+    navigate("/combined");
   };
 
   const canvasRef = useRef(null);
@@ -31,29 +26,26 @@ const Rossette = () => {
   const dragItemRef = useRef(null);
 
   // wallpaper specific
-  const currentColorRef = useRef("#000ff0");
-  const currentToolRef = useRef(2);
-  const currentLineWidthRef = useRef(3);
+  const currentColorRef = useRef("#000000");
+  const currentToolRef = useRef(5);
+  const currentLineWidthRef = useRef(5);
   const currentLineCapRef = useRef("round");
 
   const clearedItemsRef = useRef(null);
 
   const startingRef = useRef(true);
   const colors = [
-    "#000000",
-    "#FF0000",
-    "#00BB00",
+    "#FF0000", // Red
+    "#00BB00", // Green
+    "#00BBBB", // Purple
+    "#DD00DD", // Yellow
+    "#FFFF00", // Blue
     "#0000FF",
-    "#00BBBB",
-    "#DD00DD",
-    "#FFFF00",
-    "#DDDDDD",
-    "#999999",
-    "#555555",
+    "#000000", // Black
   ];
 
   const [FREEHAND_TOOL, setFreeHandTool] = useState(5);
-  const rotationCount = useRef(14);
+  const rotationCount = useRef(5);
   const reflection = useRef(false);
   const groupNum = useRef(11);
   const errorRef = useRef("");
@@ -337,8 +329,6 @@ const Rossette = () => {
     theCanvas.addEventListener("mousedown", doMouseDown);
   }
 
-  const drawGrid = () => {};
-
   // Convert the vanilla functions to React functions
   const selectLineWidth = (lineWidth) => {
     currentLineWidthRef.current = Number(lineWidth);
@@ -375,13 +365,13 @@ const Rossette = () => {
   const selectRotationCount = (count) => {
     if (count !== rotationCount.current) {
       rotationCount.current = count;
-      // You can add any additional logic here
+      drawAll();
     }
   };
 
   const doReflect = (reflect) => {
     reflection.current = reflect;
-    // You can add any additional logic here
+    drawAll();
   };
 
   const colorToName = {
@@ -428,170 +418,256 @@ const Rossette = () => {
     Freehand: 5,
   };
 
+  // Undo function
+  const undo = () => {
+    if (clearedItemsRef.current !== null) {
+      itemsRef.current = clearedItemsRef.current;
+      itemCountRef.current = itemsRef.current.length;
+      drawAll();
+      document.getElementById("undo").disabled = false;
+      document.getElementById("redo").disabled = true;
+      clearedItemsRef.current = null;
+    } else if (itemCountRef.current > 0) {
+      itemCountRef.current--;
+      drawAll();
+      if (itemCountRef.current === 0)
+        document.getElementById("undo").disabled = true;
+      document.getElementById("redo").disabled = false;
+    }
+    document.getElementById("clear").disabled = itemCountRef.current === 0;
+    document.getElementById("savebtn").disabled = itemCountRef.current === 0;
+  };
+
+  // Redo function
+  const redo = () => {
+    if (itemCountRef.current < itemsRef.current.length) {
+      itemCountRef.current++;
+      drawAll();
+      if (itemCountRef.current === itemsRef.current.length)
+        document.getElementById("redo").disabled = true;
+      document.getElementById("clear").disabled = false;
+      document.getElementById("savebtn").disabled = false;
+    }
+  };
+
+  // Clear drawing function
+  const clearDrawing = () => {
+    if (itemsRef.current.length === 0) return;
+    if (itemCountRef.current > 0) {
+      if (itemsRef.current.length > itemCountRef.current)
+        itemsRef.current.splice(
+          itemCountRef.current,
+          itemsRef.current.length - itemCountRef.current
+        );
+      clearedItemsRef.current = itemsRef.current;
+    } else {
+      clearedItemsRef.current = null;
+    }
+    itemsRef.current = [];
+    itemCountRef.current = 0;
+    drawAll();
+    document.getElementById("clear").disabled = true;
+    document.getElementById("savebtn").disabled = true;
+    document.getElementById("redo").disabled = true;
+    document.getElementById("undo").disabled = clearedItemsRef.current === null;
+  };
+
+  const handleRotationChange = (value) => {
+    const count = parseInt(value); // Convert value to integer
+    selectRotationCount(count);
+  };
+
   return (
     <>
       <Header />
-      <div id="content">
-        <h2>
-          Rosette Symmetry
-          <br />
-          <span style={{ fontSize: "60%" }}>
-            (Rotation and Dihedral Groups)
+      <div id="content" class="container mx-auto p-4">
+        <h2 className="relative text-cente  font-semibold text-white mt-4 mb-7">
+          <span className="bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 px-4 py-2 rounded-lg">
+            Rosette Design
           </span>
         </h2>
+        <div class="flex justify-center items-center mb-8">
+          <Canvas
+            ref={canvasRef}
+            width={300}
+            height={300}
+            id="c1"
+            class="rounded-full border border-gray-500"
+          />
+        </div>
 
-        <Canvas ref={canvasRef} width={600} height={600} id="c1" />
-        <Canvas ref={OcanvasRef} width={800} height={600} id="c2" hidden />
+        <Canvas ref={OcanvasRef} width={300} height={300} id="c2" hidden />
 
-        <table border={0} cellPadding={5} cellSpacing={5} align="center">
-          <tbody>
-            <tr>
-              <td valign="top" bgcolor="#DDDDDD">
-                <p>
-                  <label>
-                    <input
-                      type="checkbox"
-                      id="reflectionCB"
-                      onChange={(e) => doReflect(e.target.checked)}
-                      checked={reflection.current}
-                    />
-                    <b>Reflection</b>
-                  </label>
-                </p>
-                <p>
-                  <b>Rotations:</b>
-                  <br />
-                  {[
-                    1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17,
-                    18, 19, 20,
-                  ].map((value) => (
-                    <label key={value}>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <td class="p-4 bg-gray-300">
+            <div>
+              <label class="flex items-center">
+                <input
+                  type="checkbox"
+                  id="reflectionCB"
+                  class="form-checkbox h-4 w-4 text-indigo-600"
+                  checked={reflection.current}
+                  onChange={(e) => doReflect(e.target.checked)}
+                />
+                <span class="ml-2 font-semibold">Reflection</span>
+              </label>
+            </div>
+            <div class="mt-4">
+              <p class="font-semibold">Rotations:</p>
+              <div class="mt-2">
+                {[...Array(20)].map((_, index) => {
+                  const value = index + 1;
+                  return (
+                    <label key={value} class="inline-flex items-center mr-6">
                       <input
                         type="radio"
                         name="rotations"
                         value={value}
                         id={`r${value}`}
-                        onChange={(e) => selectRotationCount(e.target.value)} // Change this
+                        class="form-radio h-4 w-4 text-indigo-600"
                         checked={rotationCount.current === value}
+                        onChange={(e) => handleRotationChange(e.target.value)}
                       />
-                      {value === 1 ? "none" : value}
+                      <span class="ml-2">{value === 1 ? "none" : value}</span>
                     </label>
-                  ))}
-                </p>
-              </td>
-              <td valign="top">
-                <p align="center" id="bb">
-                  <button
-                    id="undo"
-                    title="Remove the most recently drawn item. Can also undo Clear if used immediately after clearing."
-                  >
-                    Undo
-                  </button>
-                  <button
-                    id="redo"
-                    title="Restore the draw item that was removed most recently by Undo."
-                  >
-                    Redo
-                  </button>
-                  <button
-                    id="clear"
-                    title="Clear the current image. This can be undone if you click 'Undo' immediately after clearing."
-                  >
-                    Clear
-                  </button>
-                  <input
-                    type="checkbox"
-                    onChange={draw}
-                    id="showSlicesCB"
-                    style={{ marginLeft: "30px" }}
-                  />
-                  <label htmlFor="showSlicesCB" style={{ color: "white" }}>
-                    Show Slices
-                  </label>
-                  <button
-                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                    onClick={handleSend}
-                  >
-                    Send
-                  </button>
-                  <button
-                    id="savebtn"
-                    onClick={handleSave}
-                    title="Save to local file. This will not save the image; it saves a specification of the image that can be reloaded into this web app."
-                  >
-                    Save
-                  </button>
-                  <button title="Load image specification from a local file. File load cannot be undone.">
-                    Load
-                  </button>
-                </p>
-              </td>
-              <td valign="top" bgcolor="#DDDDDD">
-                <p>
-                  <b>Tool:</b>
-                  <br />
-                  {[0, 1, 2, 3, 4, 5].map((tool) => (
-                    <label key={tool}>
+                  );
+                })}
+              </div>
+            </div>
+          </td>
+
+          <div class="ml-40 bg-gray-200 p-6 rounded-lg shadow-md">
+            <div className="space-x-2">
+              <button
+                id="undo"
+                className="btn bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded"
+                onClick={undo}
+                title="Remove the most recently drawn item. Can also undo Clear if used immediately after clearing."
+              >
+                Undo
+              </button>
+              <button
+                id="redo"
+                className="btn bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-4 rounded"
+                onClick={redo}
+                title="Restore the draw item that was removed most recently by Undo."
+              >
+                Redo
+              </button>
+              <button
+                id="clear"
+                className="btn bg-red-100-200 hover:bg-red-200-300 text-red-800 font-semibold py-2 px-4 rounded"
+                onClick={clearDrawing}
+                title="Clear the current image. This can be undone if you click 'Undo' immediately after clearing."
+              >
+                Clear
+              </button>
+              {/* save buttom */}
+
+              <button
+                id="savebtn"
+                className="btn bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                onClick={handleSave}
+              >
+                Send_to_Rostte_Canvas
+              </button>
+            </div>
+          </div>
+
+          <div class="ml-40 bg-gray-200 p-6 rounded-lg shadow-md">
+            <div class="grid grid-cols-3 gap-6">
+              <div>
+                <p class="font-semibold text-gray-800 mb-2">Tool:</p>
+                <div>
+                  {[...Array(6).keys()].map((tool) => (
+                    <label key={tool} class="flex items-center mb-2">
                       <input
                         type="radio"
                         name="tool"
                         value={tool}
                         id={`t${tool}`}
                         onClick={() => selectTool(tool)}
-                        checked={currentToolRef.current === tool}
+                        class="mr-2"
+                        checked="checked"
                       />
-                      {tool === 5 ? "Freehand" : ` Tool ${tool}`}
+                      <span class="text-gray-800">
+                        {
+                          [
+                            "Line",
+                            "Rectangle",
+                            "Oval",
+                            "Filled Rect",
+                            "Filled Oval",
+                            "Freehand",
+                          ][tool]
+                        }
+                      </span>
                     </label>
                   ))}
-                </p>
-                <p>
-                  <b>Line Width:</b>
-                  <br />
-                  {[1, 2, 3, 4, 5, 10, 20].map((width) => (
-                    <label key={width}>
+                </div>
+              </div>
+              <div>
+                <p class="font-semibold text-gray-800 mb-2">Line Width:</p>
+                <div>
+                  {[1, 2, 3, 4, 5, 10].map((width) => (
+                    <label key={width} class="flex items-center mb-2">
                       <input
                         type="radio"
                         name="linewidth"
                         value={width}
                         id={`lw${width}`}
                         onClick={() => selectLineWidth(width)}
-                        checked={currentLineWidthRef.current === width}
+                        class="mr-2"
+                        checked="checked"
                       />
-                      {width}
+                      <span class="text-gray-800">{width}</span>
                     </label>
                   ))}
-                </p>
-                <p>
-                  <b>Color:</b>
-                  <br />
-                  {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((color) => (
-                    <label key={color}>
+                </div>
+              </div>
+              <div>
+                <p class="font-semibold text-gray-800 mb-2">Color:</p>
+                <div>
+                  {[...Array(7).keys()].map((color) => (
+                    <label key={color} class="flex items-center mb-2">
                       <input
                         type="radio"
                         name="color"
                         value={color}
                         id={`c${color}`}
-                        onChange={drawGrid} // Change this
                         onClick={() => selectColor(color)}
-                        checked={
-                          colors[currentColorRef.current] === colors[color]
-                        }
+                        class="mr-2"
+                        checked="checked"
                       />
-                      {color === 7 ? "Light Gray" : ` Color ${color}`}
+                      <span class="text-gray-800">
+                        {
+                          [
+                            "Red",
+                            "Green",
+                            "Cyan",
+                            "Magenta",
+                            "Yellow",
+                            "Blue",
+                            "Black",
+                          ][color]
+                        }
+                      </span>
                     </label>
                   ))}
-                </p>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <p id="showGridCB"></p>
         <p id="error"></p>
+
         {canvasImage && (
           <img
             src={canvasImage}
             alt="Design"
-            className="mt-4 rounded border border-gray-500"
+            class="mt-8 rounded border border-gray-500"
           />
         )}
       </div>

@@ -1,12 +1,15 @@
 import { BrowserRouter, Outlet, Route, Routes } from "react-router-dom";
 import Header from "./components/Header";
 import Home from "./components/Home";
-import Footer from "./components/Footer";
 import Rossette from "./components/rosette";
-import Frieze from "./components/frieze";
 import Walpaper from "./components/Walpaper";
-import Demo from "./components/Demo";
 import Canvas from "./components/Canvas";
+import CanvasWallpaper from "./components/CanvasWalpaper";
+import CombinedCanvas from "./components/CombinedCanvas";
+import CanvasRosette from "./components/CanvasRosette";
+import FriezeSymmetry from "./components/Fireze";
+import CanvasFireze from "./components/CanvasFireze";
+import FinalOutput from "./components/Final_Generate";
 
 function App() {
   return (
@@ -15,12 +18,15 @@ function App() {
         <Route path="/" element={<Header />} />
         <Route index element={<Home />} />
         <Route path="home" element={<Home />} />
-        <Route path="rossette" element={<Rossette />} />
-        <Route path="contact" element={<Frieze />} />
-        <Route path="footer" element={<Footer />} />
-        <Route path="demo" element={<Demo />} />
-        <Route path="walpaper" element={<Walpaper />} />
+        <Route path="rosette" element={<Rossette />} />
+        <Route path="wallpaper" element={<Walpaper />} />
+        <Route path="fireze" element={<FriezeSymmetry />} />
         <Route path="canvas" element={<Canvas />} />
+        <Route path="c-rosette" element={<CanvasRosette />} />
+        <Route path="c-wall" element={<CanvasWallpaper />} />
+        <Route path="c-fireze" element={<CanvasFireze />} />
+        <Route path="combined" element={<CombinedCanvas />} />
+        <Route path="finale" element={<FinalOutput />} />
       </Routes>
     </BrowserRouter>
   );
